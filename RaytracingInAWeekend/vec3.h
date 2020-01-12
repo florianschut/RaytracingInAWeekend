@@ -21,7 +21,8 @@ public:
 	    float e[3];
 	};
 	
-    vec3() {}
+    vec3():x(0), y(0), z(0) {}
+    vec3(float e) :x(e), y(e), z(e) {}
     vec3(float e0, float e1, float e2) { e[0] = e0; e[1] = e1; e[2] = e2; }
 
     inline const vec3& operator+() const { return *this; }
@@ -52,7 +53,7 @@ inline std::ostream& operator<<(std::ostream& os, const vec3& t) {
 }
 
 inline void vec3::make_unit_vector() {
-    float k = 1.0 / sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
+    float k = 1.0f / sqrt(e[0] * e[0] + e[1] * e[1] + e[2] * e[2]);
     e[0] *= k; e[1] *= k; e[2] *= k;
 }
 
@@ -132,7 +133,7 @@ inline vec3& vec3::operator/=(const vec3& v) {
 }
 
 inline vec3& vec3::operator/=(const float t) {
-    float k = 1.0 / t;
+    float k = 1.0f / t;
 
     e[0] *= k;
     e[1] *= k;
