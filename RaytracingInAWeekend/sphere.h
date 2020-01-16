@@ -5,10 +5,11 @@ class sphere: public hittable
 {
 public:
 	sphere() {}
-	sphere(vec3 center, float radius): center(center), radius(radius){};
+	sphere(vec3 center, float radius, material* material): center(center), radius(radius), mat_ptr(material){};
 	virtual bool hit(const ray& r, float t_min, float t_max, hit_record& record) const;
 	vec3 center;
 	float radius;
+	material* mat_ptr;
 };
 
 bool sphere::hit(const ray& r, float t_min, float t_max, hit_record& record) const
@@ -27,6 +28,7 @@ bool sphere::hit(const ray& r, float t_min, float t_max, hit_record& record) con
 			record.t = t_temp;
 			record.p = r.point_at_parameter(t_temp);
 			record.normal = (record.p - center) / radius;
+			record.mat_ptr = mat_ptr;
 			return true;
 		}
 
@@ -36,6 +38,7 @@ bool sphere::hit(const ray& r, float t_min, float t_max, hit_record& record) con
 			record.t = t_temp;
 			record.p = r.point_at_parameter(t_temp);
 			record.normal = (record.p - center) / radius;
+			record.mat_ptr = mat_ptr;
 			return true;
 		}
 	}
