@@ -18,6 +18,7 @@
 #include "stb_image_write.h"
 #include "metal.h"
 #include "lambertian.h"
+#include "dielectric.h"
 float vertices[] =
 {
 	-1.0f, 1.0f, 1.0f, 1.0f, -1.0f, -1.0f, 
@@ -201,12 +202,13 @@ int main()
 	camera cam(aspect_ratio);
 
 	hittable* list[] = {
-		new sphere(vec3(0.f, 0.f, -1.25f), 0.5f, new lambertian(vec3(0.8f, 0.3f, 0.3f))),
-		new sphere(vec3(0.f, -100.5f, -1.25f), 100.f, new lambertian(vec3(0.8f, 0.8f, 0.0f))),
-		new sphere(vec3(1.f, 0.f, -1.25f), 0.5f, new metal(vec3(0.8f, 0.6f, 0.2f), 0.3f)),
-		new sphere(vec3(-1.f, 0.f, -1.25f), 0.5f, new metal(vec3(0.8f, 0.8f, 0.8f), 0.1f))
+		new sphere(vec3(0.f, 0.f, -1.f), 0.5f, new lambertian(vec3(0.1f, 0.2f, 0.5f))),
+		new sphere(vec3(0.f, -100.5f, -1.f), 100.f, new lambertian(vec3(0.8f, 0.8f, 0.0f))),
+		new sphere(vec3(1.f, 0.f, -1.f), 0.5f, new metal(vec3(0.8f, 0.6f, 0.2f), 0.3f)),
+		new sphere(vec3(-1.f, 0.f, -1.f), 0.5f, new dielectric(1.5f)),
+		new sphere(vec3(-1.f, 0.0f, -1.f), -0.475f, new dielectric(1.5f)),
 	};
-	hittable* world = new hittable_list(list, 4);
+	hittable* world = new hittable_list(list, 5);
 	
 	unsigned int n = 0;
 	unsigned int samples = 0;
