@@ -1,15 +1,26 @@
 #pragma once
+#define _USE_MATH_DEFINES
+#include <math.h>
 
 #include "ray.h"
 class camera 
 {
 public:
-	camera(float aspect_ratio) : 
-		origin(vec3(0)), 
-		lower_left_corner(vec3(-aspect_ratio, -1.f, -1.f)), 
-		horizontal(vec3(2* aspect_ratio, 0.f, 0.f)), 
-		vertical(vec3(0.f, 2.f, 0.f)) 
-	{}
+	camera(vec3 lookfrom, vec3 lookat, vec3 up, float vfov, float aspect_ratio) 
+	{
+		vec3 u, v, w;
+		float theta = vfov * M_PI/ 180.f;
+		float half_height = tan(theta / 2.f);
+		float half_width = aspect_ratio * half_height;
+		origin = lookfrom;
+		w = unit_vector(lookfrom - lookat);
+		u = unit_vector(cross(up, w));
+		v = cross(w, u);
+		lower_left_corner = origin - half_width * u - half_height * v - w;
+		
+		horizontal = 2 * half_width * u;
+		vertical = 2.f * half_height * v;
+	}
 	
 	ray get_ray(float x, float y)
 	{

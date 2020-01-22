@@ -20,9 +20,22 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\ThirdParty\glad\src\glad.c" />
+    <ClCompile Include="..\ThirdParty\ImGui\imgui.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGui\imgui_demo.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGui\imgui_draw.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGui\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGui\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\ThirdParty\ImGui\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\ThirdParty\ImGui\imconfig.h" />
+    <ClInclude Include="..\ThirdParty\ImGui\imgui.h" />
+    <ClInclude Include="..\ThirdParty\ImGui\imgui_impl_glfw.h" />
+    <ClInclude Include="..\ThirdParty\ImGui\imgui_internal.h" />
+    <ClInclude Include="..\ThirdParty\ImGui\imstb_rectpack.h" />
+    <ClInclude Include="..\ThirdParty\ImGui\imstb_textedit.h" />
+    <ClInclude Include="..\ThirdParty\ImGui\imstb_truetype.h" />
     <ClInclude Include="camera.h" />
     <ClInclude Include="dielectric.h" />
     <ClInclude Include="hittable.h" />
