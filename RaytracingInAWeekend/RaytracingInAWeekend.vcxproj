@@ -48,7 +48,6 @@
     <ClInclude Include="sphere.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="stb_image_write.h" />
-    <ClInclude Include="vec3.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -106,7 +105,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\ThirdParty\glfw\include;$(SolutionDir)\ThirdParty\glad\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\ThirdParty\glfw\include;$(SolutionDir)\ThirdParty\glad\include;$(SolutionDir)\ThirdParty;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\ThirdParty\glfw\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -114,7 +113,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)\ThirdParty\glfw\include;$(SolutionDir)\ThirdParty\glad\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\ThirdParty\glfw\include;$(SolutionDir)\ThirdParty\glad\include;$(SolutionDir)\ThirdParty;$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\ThirdParty\glfw\Release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -139,7 +138,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

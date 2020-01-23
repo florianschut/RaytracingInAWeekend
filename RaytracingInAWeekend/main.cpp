@@ -1,16 +1,18 @@
 #include <chrono>
 #include <iostream>
+#include <thread>
 #include <future>
 
 #include "glad/glad.h"
 #include "glfw3.h"
+
+#include <glm/glm.hpp>
 
 #include "../ThirdParty/ImGui/imgui.h"
 #include "../ThirdParty/ImGui/imgui_impl_opengl3.h"
 #include "../ThirdParty/ImGui/imgui_impl_glfw.h"
 
 #include "ray.h"
-#include "vec3.h"
 #include "camera.h"
 #include "random.h"
 #include "material.h"
@@ -82,47 +84,42 @@ void tickImGui(camera& camera)
 	// Create a window called "My First Tool", with a menu bar.
 	ImGui::Begin("Camera", &camera_menu_open);
 
-	if (ImGui::DragFloat3("Position", &camera.origin.x))
-		cam_did_change = true;
+	glm::vec3 camPos = camera.get_origin();
 	
-	// Plot some values
-	const float my_values[] = { 0.2f, 0.1f, 1.0f, 0.5f, 0.9f, 2.2f };
-	ImGui::PlotLines("Frame Times", my_values, IM_ARRAYSIZE(my_values));
-
-	// Display contents in a scrolling region
-	ImGui::TextColored(ImVec4(1, 1, 0, 1), "Important Stuff");
-	ImGui::BeginChild("Scrolling");
-	for (int n = 0; n < 50; n++)
-		ImGui::Text("%04d: Some text", n);
-	ImGui::EndChild();
+	if (ImGui::DragFloat3("Position", &camPos.x))
+	{
+		cam_did_change = true;
+		camera.set_origin(camPos);
+	}
+	
 	ImGui::End();
 
 	ImGui::Render();
 	
 }
 
-vec3 color(const ray& r, hittable* world, unsigned int depth)
+glm::vec3 color(const ray& r, hittable* world, unsigned int depth)
 {
 	hit_record record;
 
 	if (world->hit(r, 0.001f, FLT_MAX, record))
 	{
 		ray scattered;
-		vec3 attenuation;
+		glm::vec3 attenuation;
 		if (depth < max_depth && record.mat_ptr->scatter(r, record, attenuation, scattered))
 		{
 			return attenuation * color(scattered, world, depth + 1);
 		}
 		else
 		{
-			return vec3(0.f);
+			return glm::vec3(0.f);
 		}
 	}
 	else
 	{
-		const vec3 unit_direction = unit_vector(r.direction);
+		const glm::vec3 unit_direction = normalize(r.direction);
 		float t = 0.5f * (unit_direction.y + 1.0f);
-		return (1.0f - t) * vec3(1.f, 1.f, 1.f) + t * vec3(0.5f, 0.7f, 1.0f);
+		return (1.0f - t) * glm::vec3(1.f, 1.f, 1.f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
 	}
 }
 struct thread_data {
@@ -138,19 +135,26 @@ struct thread_data {
 
 void render_frames(thread_data data)
 {
-	unsigned int n = 0;
-	for (int y = data.ny - 1; y >= 0; y--)
+	try
 	{
-		for (int x = 0; x < data.nx; x++)
+		unsigned int n = 0;
+		for (int y = data.ny - 1; y >= 0; y--)
 		{
-			float u = float(x + random_double()) / float(data.nx);
-			float v = float(y + random_double()) / float(data.ny);
-			vec3 col = color(data.cam.get_ray(u, v), data.world, 0);
-			
-			data.img_data[n++] += col.r;
-			data.img_data[n++] += col.g;
-			data.img_data[n++] += col.b;
+			for (int x = 0; x < data.nx; x++)
+			{
+				float u = float(x + random_double()) / float(data.nx);
+				float v = float(y + random_double()) / float(data.ny);
+				glm::vec3 col = color(data.cam.get_ray(u, v), data.world, 0);
+
+				data.img_data[n++] += col.r;
+				data.img_data[n++] += col.g;
+				data.img_data[n++] += col.b;
+			}
 		}
+	}
+	catch (const std::exception& e)
+	{
+		std::cerr << "THREAD-EXCEPTION (thread: " << std::this_thread::get_id() << ")"<<e.what() << std::endl;
 	}
 }
 
@@ -158,7 +162,7 @@ hittable* random_scene()
 {
 	int n = 500;
 	hittable** list = new hittable * [n + 1];
-	list[0] = new sphere(vec3(0.f, -1000.f, 0.f), 1000.f, new lambertian(vec3(0.5f, 0.5f, 0.5f)));
+	list[0] = new sphere(glm::vec3(0.f, -1000.f, 0.f), 1000.f, new lambertian(glm::vec3(0.5f, 0.5f, 0.5f)));
 	int i = 1;
 	for (int a = -11; a < 11; a++)
 	{
@@ -166,14 +170,14 @@ hittable* random_scene()
 		{
 			float choose_mat = random_double();
 
-			vec3 center(a + 0.9f * float(random_double()), 0.2f, b + 0.9f * float(random_double()));
+			glm::vec3 center(a + 0.9f * float(random_double()), 0.2f, b + 0.9f * float(random_double()));
 
-			if((center - vec3(4.f, 0.f, 0.f)).length() > 0.9f)
+			if((center - glm::vec3(4.f, 0.f, 0.f)).length() > 0.9f)
 			{
 				if (choose_mat < 0.8)//diffuse
 				{
 					list[i++] = new sphere(center, 0.2f,
-						new lambertian(vec3(
+						new lambertian(glm::vec3(
 							float(random_double() * random_double()),
 							float(random_double() * random_double()),
 							float(random_double() * random_double()))));
@@ -182,7 +186,7 @@ hittable* random_scene()
 				{
 					list[i++] = new sphere(center, 0.2f,
 						new metal(
-							vec3(0.5f * float(1.0 + random_double()),
+							glm::vec3(0.5f * float(1.0 + random_double()),
 							0.5f * float(1.0 + random_double()),
 							0.5f * float(1.0 + random_double())),
 							float(0.5 * random_double()))
@@ -195,9 +199,9 @@ hittable* random_scene()
 			}
 		}
 	}
-	list[i++] = new sphere(vec3(0.f, 1.f, 0.f), 1.0f, new dielectric(1.5f));
-	list[i++] = new sphere(vec3(-4.f, 1.f, 0.f), 1.f, new lambertian(vec3(0.91f, 0.13f, 0.15f)));
-	list[i++] = new sphere(vec3(4.f, 1.f, 0.f), 1.f, new metal(vec3(0.7f, 0.6f, 0.5f), 0.0));
+	list[i++] = new sphere(glm::vec3(0.f, 1.f, 0.f), 1.0f, new dielectric(1.5f));
+	list[i++] = new sphere(glm::vec3(-4.f, 1.f, 0.f), 1.f, new lambertian(glm::vec3(0.91f, 0.13f, 0.15f)));
+	list[i++] = new sphere(glm::vec3(4.f, 1.f, 0.f), 1.f, new metal(glm::vec3(0.7f, 0.6f, 0.5f), 0.0));
 	return new hittable_list(list, i);
 }
 
@@ -305,14 +309,14 @@ int main()
 	const auto img_data = new uint8_t[nx * ny * 3];
 	const auto float_img_data = new float[nx * ny * 3];
 	
-	camera cam(vec3(5.f, 1.5f, 3.f), vec3(0.f, 0.f, 0.f), vec3(0.f, 1.f, 0.f),75.f, float(nx) / float(ny));
+	camera cam(glm::vec3(5.f, 1.5f, 3.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f),75.f, float(nx) / float(ny));
 
 	hittable* list[] = {
-		new sphere(vec3(0.f, 0.f, -1.f), 0.5f, new lambertian(vec3(0.1f, 0.2f, 0.5f))),
-		new sphere(vec3(0.f, -100.5f, -1.f), 100.f, new lambertian(vec3(0.8f, 0.8f, 0.0f))),
-		new sphere(vec3(1.f, 0.f, -1.f), 0.5f, new metal(vec3(0.8f, 0.6f, 0.2f), 0.3f)),
-		new sphere(vec3(-1.f, 0.f, -1.f), 0.5f, new dielectric(1.5f)),
-		//new sphere(vec3(-1.f, 0.0f, -1.f), -0.475f, new dielectric(1.5f)),
+		new sphere(glm::vec3(0.f, 0.f, -1.f), 0.5f, new lambertian(glm::vec3(0.1f, 0.2f, 0.5f))),
+		new sphere(glm::vec3(0.f, -100.5f, -1.f), 100.f, new lambertian(glm::vec3(0.8f, 0.8f, 0.0f))),
+		new sphere(glm::vec3(1.f, 0.f, -1.f), 0.5f, new metal(glm::vec3(0.8f, 0.6f, 0.2f), 0.3f)),
+		new sphere(glm::vec3(-1.f, 0.f, -1.f), 0.5f, new dielectric(1.5f)),
+		//new sphere(glm::vec3(-1.f, 0.0f, -1.f), -0.475f, new dielectric(1.5f)),
 	};
 	hittable* world = new hittable_list(list, 4);
 	
@@ -320,11 +324,11 @@ int main()
 	unsigned int samples = 0;
 	bool did_render = false;
 	auto start_running = std::chrono::system_clock::now();
-
-	std::thread rendering_thread([&window, &ny, &nx, &spp, &world, &cam, &float_img_data, &img_data, &samples, &shaderProgram, &texture, &VAO, &did_render]
+	bool window_closed = false;
+	std::thread rendering_thread([&window_closed, &ny, &nx, &spp, &world, &cam, &float_img_data, &img_data, &samples, &shaderProgram, &texture, &VAO, &did_render]
 	{
 		const unsigned int thread_count = 6;
-		while (!glfwWindowShouldClose(window))
+		while (!window_closed)
 		{
 			auto start_render = std::chrono::system_clock::now();
 
@@ -338,7 +342,7 @@ int main()
 			{
 				threads[i]->join();
 			}
-
+			
 			samples += thread_count;
 			
 			int array_size = nx * ny * 3;
@@ -396,6 +400,7 @@ int main()
 		glfwSwapBuffers(window);
 	}
 	
+	window_closed = true;
 	rendering_thread.join();
 
 	std::chrono::duration<double> runtime = std::chrono::system_clock::now() - start_running;
