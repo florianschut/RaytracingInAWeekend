@@ -13,19 +13,10 @@ public:
 		theta = vfov * M_PI/ 180.f;
 		half_height = tan(theta / 2.f);
 		half_width = aspect_ratio * half_height;
-		origin = lookfrom;
 		look_at = lookat;
 		up = upVec;
 		
-		glm::vec3 u, v, w;
-		
-		w = normalize(lookfrom - lookat);
-		u = normalize(cross(up, w));
-		v = cross(w, u);
-		lower_left_corner = origin - half_width * u - half_height * v - w;
-		
-		horizontal = 2 * half_width * u;
-		vertical = 2.f * half_height * v;
+		set_origin(lookfrom);
 	}
 	
 	ray get_ray(float x, float y)
