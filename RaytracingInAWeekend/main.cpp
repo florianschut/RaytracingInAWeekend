@@ -322,11 +322,11 @@ int main()
 	unsigned int samples = 0;
 	bool did_render = false;
 	auto start_running = std::chrono::system_clock::now();
-	bool window_closed = false;
-	std::thread rendering_thread([&window_closed, &ny, &nx, &spp, &world, &cam, &float_img_data, &img_data, &samples, &shaderProgram, &texture, &VAO, &did_render]
+	
+	std::thread rendering_thread([&window, &ny, &nx, &spp, &world, &cam, &float_img_data, &img_data, &samples, &shaderProgram, &texture, &VAO, &did_render]
 	{
 		const unsigned int thread_count = 6;
-		while (!window_closed)
+		while (!glfwWindowShouldClose(window))
 		{
 			auto start_render = std::chrono::system_clock::now();
 
@@ -398,7 +398,6 @@ int main()
 		glfwSwapBuffers(window);
 	}
 	
-	window_closed = true;
 	rendering_thread.join();
 
 	std::chrono::duration<double> runtime = std::chrono::system_clock::now() - start_running;
