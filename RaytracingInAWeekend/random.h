@@ -3,7 +3,7 @@
 #include <functional>
 #include <random>
 
-#include "vec3.h"
+#include <glm/glm.hpp>
 
 inline double random_double()
 {
@@ -14,12 +14,13 @@ inline double random_double()
 	return random_generator();
 }
 
-inline vec3 random_in_unit_sphere()
+inline glm::vec3 random_in_unit_sphere()
 {
-	vec3 retval;
+	glm::vec3 retval;
 	do
 	{
-		retval = 2 * vec3(random_double(), random_double(), random_double()) - vec3(1.f);
-	} while (retval.squared_length() >= 1.0f);
+		retval = 2.f * glm::vec3(random_double(), random_double(), random_double()) - glm::vec3(1.f);
+	} while ((length(retval) * length(retval)) >= 1.0f);
+	
 	return retval;
 }

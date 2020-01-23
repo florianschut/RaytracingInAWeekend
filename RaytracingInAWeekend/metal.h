@@ -4,19 +4,19 @@
 class metal: public material
 {
 public:
-	metal(const vec3& albedo, float f) : albedo(albedo)
+	metal(const glm::vec3& albedo, float fuzziness) : albedo(albedo)
 	{
-		if (f < 1) fuzz = f; else fuzz = 1.f;
+		if (fuzziness < 1) fuzz = fuzziness; else fuzz = 1.f;
 	}
 	
-	virtual bool scatter(const ray& r_in, const hit_record& rec, vec3& attenuation, ray& scattered) const
+	virtual bool scatter(const ray& r_in, const hit_record& rec, glm::vec3& attenuation, ray& scattered) const
 	{
-		vec3 reflected = unit_vector(r_in.direction).reflect(rec.normal);
+		glm::vec3 reflected = reflect(normalize(r_in.direction),rec.normal);
 		scattered = ray(rec.p, reflected + fuzz * random_in_unit_sphere());
 		attenuation = albedo;
 		return (dot(scattered.direction, rec.normal) > 0);
 	}
 	
-	vec3 albedo;
+	glm::vec3 albedo;
 	float fuzz;
 };
