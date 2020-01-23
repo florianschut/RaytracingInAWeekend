@@ -82,8 +82,13 @@ void tickImGui(camera& camera)
 	// Create a window called "My First Tool", with a menu bar.
 	ImGui::Begin("Camera", &camera_menu_open);
 
-	if (ImGui::DragFloat3("Position", &camera.origin.x))
+	vec3 camPos = camera.get_origin();
+
+	if (ImGui::DragFloat3("Position", &camPos.x))
+	{
 		cam_did_change = true;
+		camera.set_origin(camPos);
+	}
 	
 	// Plot some values
 	const float my_values[] = { 0.2f, 0.1f, 1.0f, 0.5f, 0.9f, 2.2f };
