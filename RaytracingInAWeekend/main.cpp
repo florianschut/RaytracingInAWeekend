@@ -81,8 +81,7 @@ void tickImGui(camera& camera)
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	// Create a window called "My First Tool", with a menu bar.
-	ImGui::Begin("Camera", &camera_menu_open);
+	ImGui::Begin("Camera Settings", &camera_menu_open);
 
 	glm::vec3 camPos = camera.get_origin();
 	
@@ -95,7 +94,6 @@ void tickImGui(camera& camera)
 	ImGui::End();
 
 	ImGui::Render();
-	
 }
 
 glm::vec3 color(const ray& r, hittable* world, unsigned int depth)
