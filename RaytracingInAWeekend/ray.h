@@ -5,8 +5,7 @@
 class ray
 {
 public:
-	ray() {};
-	ray(const glm::vec3& origin, const glm::vec3& direction):A(origin), B(direction){}
+	ray(const glm::vec3& origin = glm::vec3(), const glm::vec3& direction = glm::vec3()):A(origin), B(direction){}
 
 	glm::vec3 point_at_parameter(float t) const { return A + B * t; }
 

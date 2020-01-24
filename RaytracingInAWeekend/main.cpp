@@ -1,7 +1,7 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
-#include <future>
+
 
 #include "glad/glad.h"
 #include "glfw3.h"
@@ -140,8 +140,8 @@ void render_frames(thread_data data)
 		{
 			for (int x = 0; x < data.nx; x++)
 			{
-				float u = float(x + random_double()) / float(data.nx);
-				float v = float(y + random_double()) / float(data.ny);
+				float u = (static_cast<float>(x) + random_float()) / static_cast<float>(data.nx);
+				float v = (static_cast<float>(y) + random_float()) / static_cast<float>(data.ny);
 				glm::vec3 col = color(data.cam.get_ray(u, v), data.world, 0);
 
 				data.img_data[n++] += col.r;
@@ -158,36 +158,36 @@ void render_frames(thread_data data)
 
 hittable* random_scene()
 {
-	int n = 500;
-	hittable** list = new hittable * [n + 1];
+	const int n = 500;
+	auto list = new hittable * [n + 1];
 	list[0] = new sphere(glm::vec3(0.f, -1000.f, 0.f), 1000.f, new lambertian(glm::vec3(0.5f, 0.5f, 0.5f)));
 	int i = 1;
 	for (int a = -11; a < 11; a++)
 	{
 		for (int b = -11; b < 11; b++)
 		{
-			float choose_mat = random_double();
+			const float choose_mat = random_float();
 
-			glm::vec3 center(a + 0.9f * float(random_double()), 0.2f, b + 0.9f * float(random_double()));
+			glm::vec3 center(a + 0.9f * random_float(), 0.2f, b + 0.9f * random_float());
 
 			if((center - glm::vec3(4.f, 0.f, 0.f)).length() > 0.9f)
 			{
-				if (choose_mat < 0.8)//diffuse
+				if (choose_mat < 0.8f)//diffuse
 				{
 					list[i++] = new sphere(center, 0.2f,
 						new lambertian(glm::vec3(
-							float(random_double() * random_double()),
-							float(random_double() * random_double()),
-							float(random_double() * random_double()))));
+							random_float() * random_float(),
+							random_float() * random_float(),
+							random_float() * random_float())));
 				}
 				else if(choose_mat < 0.95f)//metal
 				{
 					list[i++] = new sphere(center, 0.2f,
 						new metal(
-							glm::vec3(0.5f * float(1.0 + random_double()),
-							0.5f * float(1.0 + random_double()),
-							0.5f * float(1.0 + random_double())),
-							float(0.5 * random_double()))
+							glm::vec3(0.5f * (1.0f + random_float()),
+							0.5f * (1.0f + random_float()),
+							0.5f * (1.0f + random_float())),
+							0.5f * random_float())
 							);
 				}
 				else//glass
@@ -199,7 +199,7 @@ hittable* random_scene()
 	}
 	list[i++] = new sphere(glm::vec3(0.f, 1.f, 0.f), 1.0f, new dielectric(1.5f));
 	list[i++] = new sphere(glm::vec3(-4.f, 1.f, 0.f), 1.f, new lambertian(glm::vec3(0.91f, 0.13f, 0.15f)));
-	list[i++] = new sphere(glm::vec3(4.f, 1.f, 0.f), 1.f, new metal(glm::vec3(0.7f, 0.6f, 0.5f), 0.0));
+	list[i++] = new sphere(glm::vec3(4.f, 1.f, 0.f), 1.f, new metal(glm::vec3(0.7f, 0.6f, 0.5f), 0.0f));
 	return new hittable_list(list, i);
 }
 
@@ -307,7 +307,7 @@ int main()
 	const auto img_data = new uint8_t[nx * ny * 3];
 	const auto float_img_data = new float[nx * ny * 3];
 	
-	camera cam(glm::vec3(5.f, 1.5f, 3.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f),75.f, float(nx) / float(ny));
+	camera cam(glm::vec3(5.f, 1.5f, 3.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f),75.f, static_cast<float>(nx) / static_cast<float>(ny));
 
 	hittable* list[] = {
 		new sphere(glm::vec3(0.f, 0.f, -1.f), 0.5f, new lambertian(glm::vec3(0.1f, 0.2f, 0.5f))),
@@ -318,12 +318,11 @@ int main()
 	};
 	hittable* world = new hittable_list(list, 4);
 	
-	unsigned int n = 0;
 	unsigned int samples = 0;
 	bool did_render = false;
 	auto start_running = std::chrono::system_clock::now();
 	
-	std::thread rendering_thread([&window, &ny, &nx, &spp, &world, &cam, &float_img_data, &img_data, &samples, &shaderProgram, &texture, &VAO, &did_render]
+	std::thread rendering_thread([&window, &ny, &nx, &spp, &world, &cam, &float_img_data, &img_data, &samples, &did_render]
 	{
 		const unsigned int thread_count = 6;
 		while (!glfwWindowShouldClose(window))
@@ -345,7 +344,7 @@ int main()
 			
 			int array_size = nx * ny * 3;
 			for (int i = 0; i < array_size; i++)
-				img_data[i] = uint8_t(255.99 * sqrt(float_img_data[i] / float(samples)));
+				img_data[i] = uint8_t(255.99f * sqrt(float_img_data[i] / static_cast<float>(samples)));
 
 			if (cam_did_change)
 			{

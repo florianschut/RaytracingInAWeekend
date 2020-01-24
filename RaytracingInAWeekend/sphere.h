@@ -4,7 +4,6 @@
 class sphere: public hittable
 {
 public:
-	sphere() {}
 	sphere(glm::vec3 center, float radius, material* material): center(center), radius(radius), mat_ptr(material){};
 	virtual bool hit(const ray& r, float t_min, float t_max, hit_record& record) const;
 	glm::vec3 center;

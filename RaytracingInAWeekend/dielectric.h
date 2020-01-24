@@ -61,7 +61,7 @@ public:
 			reflect_prob = 1.0f;
 		}
 
-		if(random_double() < reflect_prob)
+		if(random_float() < reflect_prob)
 		{
 			scattered = ray(rec.p, reflected);
 		}
