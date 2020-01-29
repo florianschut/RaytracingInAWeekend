@@ -1,5 +1,5 @@
 #pragma once
-#include "material.h"
+#include "material.hpp"
 
 class metal: public material
 {

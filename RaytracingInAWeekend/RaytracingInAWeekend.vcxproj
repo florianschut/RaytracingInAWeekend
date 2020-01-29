@@ -26,7 +26,9 @@
     <ClCompile Include="..\ThirdParty\ImGui\imgui_impl_glfw.cpp" />
     <ClCompile Include="..\ThirdParty\ImGui\imgui_impl_opengl3.cpp" />
     <ClCompile Include="..\ThirdParty\ImGui\imgui_widgets.cpp" />
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\renderer.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ThirdParty\ImGui\imconfig.h" />
@@ -36,18 +38,17 @@
     <ClInclude Include="..\ThirdParty\ImGui\imstb_rectpack.h" />
     <ClInclude Include="..\ThirdParty\ImGui\imstb_textedit.h" />
     <ClInclude Include="..\ThirdParty\ImGui\imstb_truetype.h" />
-    <ClInclude Include="camera.h" />
-    <ClInclude Include="dielectric.h" />
-    <ClInclude Include="hittable.h" />
-    <ClInclude Include="hittable_list.h" />
-    <ClInclude Include="lambertian.h" />
-    <ClInclude Include="material.h" />
-    <ClInclude Include="metal.h" />
-    <ClInclude Include="random.h" />
-    <ClInclude Include="ray.h" />
-    <ClInclude Include="sphere.h" />
-    <ClInclude Include="stb_image.h" />
-    <ClInclude Include="stb_image_write.h" />
+    <ClInclude Include="src\camera.hpp" />
+    <ClInclude Include="src\dielectric.hpp" />
+    <ClInclude Include="src\hittable.hpp" />
+    <ClInclude Include="src\hittable_list.hpp" />
+    <ClInclude Include="src\lambertian.hpp" />
+    <ClInclude Include="src\material.hpp" />
+    <ClInclude Include="src\metal.hpp" />
+    <ClInclude Include="src\random.hpp" />
+    <ClInclude Include="src\ray.hpp" />
+    <ClInclude Include="src\renderer.hpp" />
+    <ClInclude Include="src\sphere.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

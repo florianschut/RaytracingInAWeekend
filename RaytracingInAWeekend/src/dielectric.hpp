@@ -1,6 +1,6 @@
 #pragma once
 
-#include "material.h"
+#include "material.hpp"
 
 bool refract(const glm::vec3& v, const glm::vec3& n, float ni_over_nt, glm::vec3& refracted)
 {

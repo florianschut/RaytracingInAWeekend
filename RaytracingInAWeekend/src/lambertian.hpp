@@ -1,8 +1,8 @@
 #pragma once
-#include "material.h"
+#include "material.hpp"
 
 #include  <glm/glm.hpp>
-#include "random.h"
+#include "random.hpp"
 
 class lambertian :public material
 {
