@@ -2,7 +2,7 @@
 
 #include "material.hpp"
 
-bool refract(const glm::vec3& v, const glm::vec3& n, float ni_over_nt, glm::vec3& refracted)
+bool Refract(const glm::vec3& v, const glm::vec3& n, float ni_over_nt, glm::vec3& refracted)
 {
 	glm::vec3 uv = normalize(v);
 	float dt = glm::dot(uv, n);
@@ -16,19 +16,19 @@ bool refract(const glm::vec3& v, const glm::vec3& n, float ni_over_nt, glm::vec3
 		return false;
 }
 
-float schlick(float cosine, float ref_idx)
+float Schlick(float cosine, float ref_idx)
 {
 	float r0 = (1 - ref_idx) / (1 + ref_idx);
 	r0 = r0 * r0;
 	return r0 + (1 - r0) * pow((1 - cosine), 5);
 }
 
-class dielectric: public material
+class Dielectric: public Material
 {
 public:
-	dielectric(float reflection_index) : ref_index(reflection_index) {}
+	Dielectric(float reflection_index) : ref_index_(reflection_index) {}
 
-	virtual bool scatter(const ray& r_in, const hit_record& rec, glm::vec3& attenuation, ray& scattered) const
+	virtual bool Scatter(const Ray& r_in, const HitRecord& rec, glm::vec3& attenuation, Ray& scattered) const
 	{
 		glm::vec3 outward_normal;
 		glm::vec3 reflected = reflect(r_in.direction,rec.normal);
@@ -42,36 +42,36 @@ public:
 		if(dot(r_in.direction, rec.normal) > 0)
 		{
 			outward_normal = -rec.normal;
-			ni_over_nt = ref_index;
-			cosine = ref_index * dot(r_in.direction, rec.normal) / r_in.direction.length();
+			ni_over_nt = ref_index_;
+			cosine = ref_index_ * dot(r_in.direction, rec.normal) / r_in.direction.length();
 		}
 		else
 		{
 			outward_normal = rec.normal;
-			ni_over_nt = 1.0f / ref_index;
+			ni_over_nt = 1.0f / ref_index_;
 			cosine = -dot(r_in.direction, rec.normal) / r_in.direction.length();
 		}
 
-		if (refract(r_in.direction, outward_normal, ni_over_nt, refracted))
+		if (Refract(r_in.direction, outward_normal, ni_over_nt, refracted))
 		{
-			reflect_prob = schlick(cosine, ref_index);
+			reflect_prob = Schlick(cosine, ref_index_);
 		}
 		else 
 		{
 			reflect_prob = 1.0f;
 		}
 
-		if(random_float() < reflect_prob)
+		if(utility::RandomFloat() < reflect_prob)
 		{
-			scattered = ray(rec.p, reflected);
+			scattered = Ray(rec.p, reflected);
 		}
 		else
 		{
-			scattered = ray(rec.p, refracted);
+			scattered = Ray(rec.p, refracted);
 		}
 
 		return true;
 	}
 	
-	float ref_index;
+	float ref_index_;
 };

@@ -1,24 +1,21 @@
 #pragma once
-#include <chrono>
-#include <iostream>
-#include <thread>
+#include <atomic>
 
 #include <glm/glm.hpp>
 
-#include "random.hpp"
-#include "ray.hpp"
 #include "hittable.hpp"
-#include "hittable_list.hpp"
 #include "camera.hpp"
 
+struct GLFWwindow;
+
 struct ThreadData {
-	ThreadData(int ny, int nx, int spp, hittable* world, camera& cam, float* img_data) :
+	ThreadData(uint16_t ny, uint16_t nx, uint16_t spp, Hittable* world, Camera& cam, float* img_data) :
 		ny(ny), nx(nx), spp(spp), world(world), cam(cam), img_data(img_data) {};
-	int ny;
-	int nx;
-	int spp;
-	hittable* world;
-	camera& cam;
+	uint16_t ny;
+	uint16_t nx;
+	uint16_t spp;
+	Hittable* world;
+	Camera& cam;
 	float* img_data;
 };
 
@@ -26,28 +23,55 @@ class Renderer
 {
 public:
 	Renderer();
+	~Renderer();
 
-	glm::vec3 color(const ray& r, hittable* world, unsigned int depth);
+	static glm::vec3 Color(const Ray& r, Hittable* world, unsigned int depth);
+
+	bool WindowShouldClose() const;
+
+	void RenderFrames();
+
+	void SetWorld(Hittable* world);
+
+	void Tick();
 
 	GLFWwindow* GetCurrentWindow() const
 	{
 		return window_;
 	}
 
+	Camera camera_ = Camera(glm::vec3(5.f, 1.5f, 3.f), glm::vec3(0.f, 1.0f, 0.f), glm::vec3(0.f, 1.f, 0.f), 90.f, static_cast<float>(nx_) / static_cast<float>(ny_));
+
+	const std::atomic_uint32_t& samples_done_ = samples_;
+
 private:
 	bool InitOpenGL();
-	void RenderFrames(ThreadData data);
+	static void RenderSingleFrame(ThreadData data);
+	void InitImGui();
+	void TickImGui();
 
-	const uint16_t nx_ = 1280;
-	const uint16_t ny_ = 720;
+	bool did_render_ = false;
 
-	const uint16_t max_depth_ = 50;
+	static const uint16_t nx_ = 1280;
+	static const uint16_t ny_ = 720;
+	uint8_t* img_data_;
+	float* float_img_data_;
+
+	std::atomic_uint32_t samples_ = 0;
+	static const uint16_t spp_ = 256;
+	static const uint8_t thread_count_ = 11;
+	static const uint16_t max_depth_ = 50;
+
+	Hittable* world_ = nullptr;
 
 	GLFWwindow* window_ = nullptr;
 	unsigned int vbo_ = 0;
 	unsigned int vao_ = 0;
 	unsigned int vertex_shader_ = 0;
 	unsigned int render_texture_ = 0;
+	unsigned int shader_program_ = 0;
+
+	bool camera_menu_open_ = true;
 
 	const float vertices_[12] =
 	{
@@ -70,6 +94,4 @@ private:
 		"uniform sampler2D ourTexture;\n"
 		"void main() {\n"
 		"FragColor = texture(ourTexture, TexCoord);}\n";
-
-	
 };

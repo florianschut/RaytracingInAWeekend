@@ -2,22 +2,22 @@
 
 #include <glm/vec3.hpp>
 
-class ray
+class Ray
 {
 public:
-	ray(const glm::vec3& origin = glm::vec3(), const glm::vec3& direction = glm::vec3()):A(origin), B(direction){}
+	Ray(const glm::vec3& origin = glm::vec3(), const glm::vec3& direction = glm::vec3()):a_(origin), b_(direction){}
 
-	glm::vec3 point_at_parameter(float t) const { return A + B * t; }
+	glm::vec3 PointAtParameter(float t) const { return a_ + b_ * t; }
 
 	union
 	{
-		glm::vec3 A;
+		glm::vec3 a_;
 		glm::vec3 origin;
 	};
 	
 	union
 	{
-		glm::vec3 B;
+		glm::vec3 b_;
 		glm::vec3 direction;
 	};
 };

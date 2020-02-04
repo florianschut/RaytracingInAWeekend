@@ -1,10 +1,10 @@
 #pragma once
 #include "hittable.hpp"
 
-class ray;
+class Ray;
 
-class material
+class Material
 {
 public:
-	virtual bool scatter(const ray& r_in, const hit_record& rec, glm::vec3& attenuation, ray& scattered) const = 0;
+	virtual bool Scatter(const Ray& r_in, const HitRecord& rec, glm::vec3& attenuation, Ray& scattered) const = 0;
 };

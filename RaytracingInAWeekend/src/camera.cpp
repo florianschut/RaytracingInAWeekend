@@ -2,7 +2,7 @@
 
 #include <corecrt_math_defines.h>
 
-camera::camera(glm::vec3 lookfrom, glm::vec3 lookat, glm::vec3 upVec, float vfov, float aspect_ratio)
+Camera::Camera(glm::vec3 lookfrom, glm::vec3 lookat, glm::vec3 upVec, float vfov, float aspect_ratio)
 {
 	theta_ = vfov * static_cast<float>(M_PI) / 180.f;
 	half_height_ = tan(theta_ / 2.f);
@@ -10,10 +10,10 @@ camera::camera(glm::vec3 lookfrom, glm::vec3 lookat, glm::vec3 upVec, float vfov
 	look_at_ = lookat;
 	up_ = upVec;
 
-	set_origin(lookfrom);
+	SetOrigin(lookfrom);
 }
 
-void camera::set_origin(glm::vec3 new_origin)
+void Camera::SetOrigin(glm::vec3 new_origin)
 {
 	origin_ = new_origin;
 
@@ -24,4 +24,6 @@ void camera::set_origin(glm::vec3 new_origin)
 
 	horizontal_ = 2.f * half_width_ * u;
 	vertical_ = 2.f * half_height_ * v;
+
+	did_change_ = true;
 }

@@ -5,22 +5,24 @@
 
 #include "ray.hpp"
 
-class camera 
+class Camera 
 {
 public:
-	camera(glm::vec3 look_from, glm::vec3 look_at, glm::vec3 up_vec, float v_fov, float aspect_ratio);
+	Camera(glm::vec3 look_from, glm::vec3 look_at, glm::vec3 up_vec, float v_fov, float aspect_ratio);
 	
-	ray get_ray(float x, float y)
+	Ray GetRay(float x, float y)
 	{
-		return ray(origin_, lower_left_corner_ + x * horizontal_ + y * vertical_ - origin_);
+		return Ray(origin_, lower_left_corner_ + x * horizontal_ + y * vertical_ - origin_);
 	}
 
-	glm::vec3 get_origin() const
+	glm::vec3 GetOrigin() const
 	{
 		return origin_;
 	}
-	void set_origin(glm::vec3 new_origin);
+	void SetOrigin(glm::vec3 new_origin);
 	
+	bool did_change_ = false;
+
 private:
 	glm::vec3 origin_;
 	glm::vec3 lower_left_corner_;
@@ -29,7 +31,7 @@ private:
 	
 	glm::vec3 look_at_;
 	glm::vec3 up_;
-	
+
 	float theta_;
 	float half_height_;
 	float half_width_;

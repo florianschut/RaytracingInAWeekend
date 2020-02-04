@@ -4,18 +4,18 @@
 #include  <glm/glm.hpp>
 #include "random.hpp"
 
-class lambertian :public material
+class Lambertian :public Material
 {
 public:
-	lambertian(const glm::vec3& albedo) : albedo(albedo) {}
+	Lambertian(const glm::vec3& albedo_) : albedo_(albedo_) {}
 
-	virtual bool scatter(const ray&, const hit_record& rec, glm::vec3& attenuation, ray& scattered) const
+	virtual bool Scatter(const Ray&, const HitRecord& rec, glm::vec3& attenuation, Ray& scattered) const
 	{
-		glm::vec3 target = rec.p + rec.normal + random_in_unit_sphere();
-		scattered = ray(rec.p, target - rec.p);
-		attenuation = albedo;
+		glm::vec3 target = rec.p + rec.normal + utility::RandomInUnitSphere();
+		scattered = Ray(rec.p, target - rec.p);
+		attenuation = albedo_;
 		return true;
 	}
 	
-	glm::vec3 albedo;
+	glm::vec3 albedo_;
 };
