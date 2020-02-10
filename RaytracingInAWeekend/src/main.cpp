@@ -68,7 +68,6 @@ int main()
 		new Sphere(glm::vec3(0.f, -100.5f, -1.f), 100.f, new Lambertian(glm::vec3(0.8f, 0.8f, 0.0f))),
 		new Sphere(glm::vec3(1.f, 0.f, -1.f), 0.5f, new Metal(glm::vec3(0.8f, 0.6f, 0.2f), 0.3f)),
 		new Sphere(glm::vec3(-1.f, 0.f, -1.f), 0.5f, new Dielectric(1.5f)),
-		//new sphere(glm::vec3(-1.f, 0.0f, -1.f), -0.475f, new dielectric(1.5f)),
 	};
 	renderer->SetWorld(new HittableList(list, 4));
 	
@@ -91,7 +90,8 @@ int main()
 	rendering_thread.join();
 
 	std::chrono::duration<double> runtime = std::chrono::system_clock::now() - start_running;
-	std::cout << renderer->samples_done_<<" were rendered in " << runtime.count() << " seconds.\n";
+	std::cout << renderer->GetSamples() <<" spp in " << runtime.count() << " seconds = "
+		<< renderer->GetSamples() / runtime.count() << " sps " << (runtime.count() / renderer->GetSamples()) * 1000.f << " ms.";
 	delete(renderer);
 	return 0;
 }

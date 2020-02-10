@@ -3,6 +3,7 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
+#include <future>
 
 #include "glad/glad.h"
 #include "glfw3.h"
@@ -63,39 +64,45 @@ bool Renderer::WindowShouldClose() const
 
 void Renderer::RenderFrames()
 {
-	//auto start_render = std::chrono::system_clock::now();
+	unsigned int y = 0;
+	const unsigned int num_cores = std::thread::hardware_concurrency();
+	std::future<void>* futures = new std::future<void>[num_cores];
+	samples_++;
 
-	ThreadData data_for_threads(ny_, nx_, spp_, world_, camera_, float_img_data_);
-	std::thread* threads[thread_count_] = {};
-	for (int i = 0; i < thread_count_; i++)
+	//TODO: This probably will cause a load of issues on a single threaded system...
+	for (uint8_t i = 0; i < num_cores; i++)
 	{
-		threads[i] = new std::thread(&Renderer::RenderSingleFrame, data_for_threads);
+		futures[i] = std::async([=] {RenderSingleLine(y, samples_, img_data_, world_, camera_); });
+		y++;
 	}
-	for (int i = 0; i < thread_count_; i++)
+	while (y < ny_)
 	{
-		threads[i]->join();
+		for (uint8_t i = 0; i < num_cores; i++)
+		{
+			if (futures[i].wait_for(std::chrono::milliseconds(0)) == std::future_status::ready && y < ny_)
+			{
+				futures[i] = std::async([=] {RenderSingleLine(y, samples_, img_data_, world_, camera_); });
+				y++;
+			}
+		}
+	}
+	for (uint8_t i = 0; i < num_cores; i++)
+	{
+		futures[i].get();
 	}
 
-	samples_ += thread_count_;
-
-	int array_size = nx_ * ny_ * 3;
-	for (int i = 0; i < array_size; i++)
-		img_data_[i] = uint8_t(255.99f * sqrt(float_img_data_[i] / static_cast<float>(samples_)));
 
 	if (camera_.did_change_)
 	{
+		int array_size = nx_ * ny_ * 3;
 		for (int i = 0; i < array_size; i++)
 			float_img_data_[i] = 0.f;
 		samples_ = 0;
 		camera_.did_change_ = false;
 	}
-
-
 	did_render_ = true;
 
-	//std::chrono::duration<double> render_duration = std::chrono::system_clock::now() - start_render;
-	//std::cout << "Rendering took " << render_duration.count() << " seconds. Sample count is " << samples_ << std::endl;
-}
+	}
 
 void Renderer::SetWorld(Hittable* world)
 {
@@ -123,9 +130,6 @@ void Renderer::Tick()
 	ImGuiIO& io = ImGui::GetIO();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-	// Update and Render additional Platform Windows
-	// (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
-	//  For this specific demo app we could also call glfwMakeContextCurrent(window) directly)
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
 	{
 		GLFWwindow* backup_current_context = glfwGetCurrentContext();
@@ -254,6 +258,20 @@ void Renderer::RenderSingleFrame(ThreadData data)
 	catch (const std::exception & e)
 	{
 		std::cerr << "THREAD-EXCEPTION (thread: " << std::this_thread::get_id() << ")" << e.what() << std::endl;
+	}
+}
+
+void Renderer::RenderSingleLine(unsigned int y, uint32_t samples, uint8_t* img_data, Hittable* world, Camera& camera)
+{
+	std::atomic_uint n = (ny_ - 1 - y) * nx_ * 3u;
+	float v = (static_cast<float>(y) + utility::RandomFloat()) / static_cast<float>(ny_);
+	for (int x = 0; x < nx_; x++)
+	{
+		float u = (static_cast<float>(x) + utility::RandomFloat()) / static_cast<float>(nx_);
+		glm::vec3 col = Color(camera.GetRay(u, v), world, 0);
+		img_data[n++] = static_cast<uint8_t>(std::round(((static_cast<float>(img_data[n] * (samples - 1)) + 255.99 * sqrt(col.r)) / static_cast<float>(samples))));
+		img_data[n++] = static_cast<uint8_t>(std::round(((static_cast<float>(img_data[n] * (samples - 1)) + 255.99 * sqrt(col.g)) / static_cast<float>(samples))));
+		img_data[n++] = static_cast<uint8_t>(std::round(((static_cast<float>(img_data[n] * (samples - 1)) + 255.99 * sqrt(col.b)) / static_cast<float>(samples))));
 	}
 }
 
