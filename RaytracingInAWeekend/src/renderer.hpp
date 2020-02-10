@@ -49,7 +49,6 @@ public:
 
 private:
 	bool InitOpenGL();
-	static void RenderSingleFrame(ThreadData data);
 	static inline void RenderSingleLine(unsigned int y, float* img_data, Hittable* world, Camera& camera);
 	void InitImGui();
 	void TickImGui();

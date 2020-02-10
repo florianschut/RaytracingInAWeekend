@@ -109,6 +109,7 @@ void Renderer::RenderFrames()
 
 	samples_++;
 	did_render_ = true;
+	delete[] futures;
 }
 
 void Renderer::SetWorld(Hittable* world)
