@@ -50,7 +50,7 @@ public:
 private:
 	bool InitOpenGL();
 	static void RenderSingleFrame(ThreadData data);
-	static void RenderSingleLine(unsigned int y, uint32_t samples, uint8_t* img_data, Hittable* world, Camera& camera);
+	static inline void RenderSingleLine(unsigned int y, float* img_data, Hittable* world, Camera& camera);
 	void InitImGui();
 	void TickImGui();
 
@@ -58,8 +58,7 @@ private:
 
 	static const uint16_t nx_ = 1280;
 	static const uint16_t ny_ = 720;
-	uint8_t* img_data_;
-	float* float_img_data_;
+	float* img_data_;
 
 	std::atomic<uint32_t> samples_ = 0;
 	static const uint16_t spp_ = 256;
@@ -74,6 +73,7 @@ private:
 	unsigned int vertex_shader_ = 0;
 	unsigned int render_texture_ = 0;
 	unsigned int shader_program_ = 0;
+	unsigned int samples_uniform_ = 0;
 
 	bool camera_menu_open_ = true;
 
@@ -95,7 +95,8 @@ private:
 		"#version 460 core\n"
 		"in vec2 TexCoord;\n"
 		"out vec4 FragColor;\n"
+		"uniform float samples;\n"
 		"uniform sampler2D ourTexture;\n"
 		"void main() {\n"
-		"FragColor = texture(ourTexture, TexCoord);}\n";
+		"FragColor = sqrt(texture(ourTexture, TexCoord) / samples);}\n";
 };

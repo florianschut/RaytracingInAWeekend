@@ -19,8 +19,7 @@
 
 Renderer::Renderer()
 {
-	img_data_ = new uint8_t[nx_ * ny_ * 3];
-	float_img_data_ = new float[nx_ * ny_ * 3];
+	img_data_ = new float[nx_ * ny_ * 3];
 	InitOpenGL();
 	InitImGui();
 }
@@ -28,7 +27,14 @@ Renderer::Renderer()
 Renderer::~Renderer()
 {
 	glfwTerminate();
-	stbi_write_bmp("output.bmp", nx_, ny_, 3, img_data_);
+	const int array_size = nx_ * ny_ * 3;
+	uint8_t* output_img = new uint8_t[array_size];
+	for (int i = 0; i < array_size; i++)
+		output_img[i] = static_cast<uint8_t>(254.99 * sqrt(img_data_[i] / static_cast<float>(samples_)));
+
+	stbi_write_bmp("output.bmp", nx_, ny_, 3, output_img);
+	delete[] img_data_;
+	delete[] output_img;
 	delete world_;
 }
 
@@ -64,15 +70,25 @@ bool Renderer::WindowShouldClose() const
 
 void Renderer::RenderFrames()
 {
+	if (did_render_ == true) //Don't intervene with texture copy, could and should be handled more efficiently
+		return;
+	
+	if (camera_.did_change_)
+	{
+		int array_size = nx_ * ny_ * 3;
+		for (int i = 0; i < array_size; i++)
+			img_data_[i] = 0.f;
+		samples_ = 0;
+		camera_.did_change_ = false;
+	}
+
 	unsigned int y = 0;
 	const unsigned int num_cores = std::thread::hardware_concurrency();
 	std::future<void>* futures = new std::future<void>[num_cores];
-	samples_++;
 
-	//TODO: This probably will cause a load of issues on a single threaded system...
 	for (uint8_t i = 0; i < num_cores; i++)
 	{
-		futures[i] = std::async([=] {RenderSingleLine(y, samples_, img_data_, world_, camera_); });
+		futures[i] = std::async([=] {RenderSingleLine(y, img_data_, world_, camera_); });
 		y++;
 	}
 	while (y < ny_)
@@ -81,7 +97,7 @@ void Renderer::RenderFrames()
 		{
 			if (futures[i].wait_for(std::chrono::milliseconds(0)) == std::future_status::ready && y < ny_)
 			{
-				futures[i] = std::async([=] {RenderSingleLine(y, samples_, img_data_, world_, camera_); });
+				futures[i] = std::async([=] {RenderSingleLine(y, img_data_, world_, camera_); });
 				y++;
 			}
 		}
@@ -91,18 +107,9 @@ void Renderer::RenderFrames()
 		futures[i].get();
 	}
 
-
-	if (camera_.did_change_)
-	{
-		int array_size = nx_ * ny_ * 3;
-		for (int i = 0; i < array_size; i++)
-			float_img_data_[i] = 0.f;
-		samples_ = 0;
-		camera_.did_change_ = false;
-	}
+	samples_++;
 	did_render_ = true;
-
-	}
+}
 
 void Renderer::SetWorld(Hittable* world)
 {
@@ -111,19 +118,20 @@ void Renderer::SetWorld(Hittable* world)
 
 void Renderer::Tick()
 {
+	if (did_render_)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, nx_, ny_, 0, GL_RGB, GL_FLOAT, img_data_);
+		did_render_ = false;
+		glGenerateMipmap(GL_TEXTURE_2D);
+		glUniform1f(samples_uniform_, static_cast<float>(samples_)); 
+	}
 	glfwPollEvents();
 
 	TickImGui();
 
-	if (did_render_)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, nx_, ny_, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data_);
-		glGenerateMipmap(GL_TEXTURE_2D);
-		did_render_ = false;
-	}
 	glUseProgram(shader_program_);
 	glBindVertexArray(vao_);
-	glBindTexture(GL_TEXTURE_2D, render_texture_);
+	glBindTexture(GL_TEXTURE, render_texture_);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 
@@ -222,6 +230,7 @@ bool Renderer::InitOpenGL()
 	glUseProgram(shader_program_);
 	glDeleteShader(vertexShader);
 	glDeleteShader(fragmentShader);
+	samples_uniform_ = glGetUniformLocation(shader_program_, "samples");
 
 	glGenTextures(1, &render_texture_);
 	glBindTexture(GL_TEXTURE_2D, render_texture_);
@@ -236,32 +245,7 @@ bool Renderer::InitOpenGL()
 	return true;
 }
 
-void Renderer::RenderSingleFrame(ThreadData data)
-{
-	try
-	{
-		unsigned int n = 0;
-		for (int y = data.ny - 1; y >= 0; y--)
-		{
-			for (int x = 0; x < data.nx; x++)
-			{
-				float u = (static_cast<float>(x) + utility::RandomFloat()) / static_cast<float>(data.nx);
-				float v = (static_cast<float>(y) + utility::RandomFloat()) / static_cast<float>(data.ny);
-				glm::vec3 col = Color(data.cam.GetRay(u, v), data.world, 0);
-
-				data.img_data[n++] +=  col.r;
-				data.img_data[n++] +=  col.g;
-				data.img_data[n++] +=  col.b;
-			}
-		}
-	}
-	catch (const std::exception & e)
-	{
-		std::cerr << "THREAD-EXCEPTION (thread: " << std::this_thread::get_id() << ")" << e.what() << std::endl;
-	}
-}
-
-void Renderer::RenderSingleLine(unsigned int y, uint32_t samples, uint8_t* img_data, Hittable* world, Camera& camera)
+void Renderer::RenderSingleLine(unsigned int y, float* img_data, Hittable* world, Camera& camera)
 {
 	std::atomic_uint n = (ny_ - 1 - y) * nx_ * 3u;
 	float v = (static_cast<float>(y) + utility::RandomFloat()) / static_cast<float>(ny_);
@@ -269,9 +253,9 @@ void Renderer::RenderSingleLine(unsigned int y, uint32_t samples, uint8_t* img_d
 	{
 		float u = (static_cast<float>(x) + utility::RandomFloat()) / static_cast<float>(nx_);
 		glm::vec3 col = Color(camera.GetRay(u, v), world, 0);
-		img_data[n++] = static_cast<uint8_t>(std::round(((static_cast<float>(img_data[n] * (samples - 1)) + 255.99 * sqrt(col.r)) / static_cast<float>(samples))));
-		img_data[n++] = static_cast<uint8_t>(std::round(((static_cast<float>(img_data[n] * (samples - 1)) + 255.99 * sqrt(col.g)) / static_cast<float>(samples))));
-		img_data[n++] = static_cast<uint8_t>(std::round(((static_cast<float>(img_data[n] * (samples - 1)) + 255.99 * sqrt(col.b)) / static_cast<float>(samples))));
+		img_data[n++] += col.r;
+		img_data[n++] += col.g;
+		img_data[n++] += col.b;
 	}
 }
 
