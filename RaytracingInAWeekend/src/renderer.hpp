@@ -40,7 +40,7 @@ public:
 		return window_;
 	}
 
-	Camera camera_ = Camera(glm::vec3(5.f, 1.5f, 3.f), glm::vec3(0.f, 1.0f, 0.f), glm::vec3(0.f, 1.f, 0.f), 90.f, static_cast<float>(nx_) / static_cast<float>(ny_));
+	Camera camera_ = Camera(glm::vec3(5.f, 1.5f, 3.f), glm::vec3(0.f, 1.0f, 0.f), glm::vec3(0.f, 1.f, 0.f), 90.f, static_cast<float>(nx_) / static_cast<float>(ny_), 2.0f, glm::length(glm::vec3(5.f, 1.5f, 3.f) - glm::vec3(0.f, 1.0f, 0.f)));
 
 	uint32_t GetSamples() const
 	{
@@ -55,13 +55,11 @@ private:
 
 	std::atomic<bool> did_render_ = false;
 
-	static const uint16_t nx_ = 1280;
-	static const uint16_t ny_ = 720;
+	static const uint16_t nx_ = 1920;
+	static const uint16_t ny_ = 1080;
 	float* img_data_;
 
 	std::atomic<uint32_t> samples_ = 0;
-	static const uint16_t spp_ = 256;
-	static const uint8_t thread_count_ = 11;
 	static const uint16_t max_depth_ = 50;
 
 	Hittable* world_ = nullptr;

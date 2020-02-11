@@ -4,15 +4,17 @@
 #include <glm/glm.hpp>
 
 #include "ray.hpp"
-
+#include "random.hpp"
 class Camera 
 {
 public:
-	Camera(glm::vec3 look_from, glm::vec3 look_at, glm::vec3 up_vec, float v_fov, float aspect_ratio);
+	Camera(glm::vec3 look_from, glm::vec3 look_at, glm::vec3 up_vec, float v_fov, float aspect_ratio, float aperture, float focus_distance);
 	
 	Ray GetRay(float x, float y)
 	{
-		return Ray(origin_, lower_left_corner_ + x * horizontal_ + y * vertical_ - origin_);
+		glm::vec3 ray_dir = lens_radius_ * utility::RandomInUnitSphere();
+		glm::vec3 offset = u_ * ray_dir.x + v_ * ray_dir.y;
+		return Ray(origin_ + offset, lower_left_corner_ + x * horizontal_ + y * vertical_ - origin_ - offset);
 	}
 
 	glm::vec3 GetOrigin() const
@@ -29,10 +31,16 @@ private:
 	glm::vec3 horizontal_;
 	glm::vec3 vertical_;
 	
+	glm::vec3 w_;
+	glm::vec3 u_;
+	glm::vec3 v_;
+
 	glm::vec3 look_at_;
 	glm::vec3 up_;
 
 	float theta_;
 	float half_height_;
 	float half_width_;
+	float lens_radius_;
+	float focus_distance_;
 };
