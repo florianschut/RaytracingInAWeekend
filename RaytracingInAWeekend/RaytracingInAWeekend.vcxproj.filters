@@ -57,6 +57,9 @@
     <ClCompile Include="src\hittable_list.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\moving_sphere.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ThirdParty\ImGui\imconfig.h">
@@ -111,6 +114,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\renderer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\moving_sphere.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

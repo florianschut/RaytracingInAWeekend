@@ -8,14 +8,15 @@
 #include "random.hpp"
 #include "hittable_list.hpp"
 #include "sphere.hpp"
+#include "moving_sphere.hpp"
 #include "metal.hpp"
 #include "lambertian.hpp"
 #include "dielectric.hpp"
 
-Hittable* random_scene()
+Hittable* RandomScene()
 {
 	const int n = 500;
-	auto list = new Hittable * [n + 1];
+	auto list = new Hittable* [n + 1];
 	list[0] = new Sphere(glm::vec3(0.f, -1000.f, 0.f), 1000.f, new Lambertian(glm::vec3(0.5f, 0.5f, 0.5f)));
 	int i = 1;
 	for (int a = -11; a < 11; a++)
@@ -28,7 +29,17 @@ Hittable* random_scene()
 
 			if((center_ - glm::vec3(4.f, 0.f, 0.f)).length() > 0.9f)
 			{
-				if (choose_mat < 0.8f)//diffuse
+				if (choose_mat < 0.4f)//Moving diffuse
+				{
+					list[i++] = new MovingSphere(center_, 
+						center_+ glm::vec3(0.0f, 0.5f * utility::RandomFloat(), 0.f), 
+						0.f, 1.f, 0.2f,
+						new Lambertian(glm::vec3(
+							utility::RandomFloat() * utility::RandomFloat(),
+							utility::RandomFloat() * utility::RandomFloat(),
+							utility::RandomFloat() * utility::RandomFloat())));
+				}
+				else if (choose_mat < 0.8f)//diffuse
 				{
 					list[i++] = new Sphere(center_, 0.2f,
 						new Lambertian(glm::vec3(
@@ -59,19 +70,26 @@ Hittable* random_scene()
 	return new HittableList(list, i);
 }
 
+Hittable* SimpleScene()
+{
+	const int n = 4;
+	auto list = new Hittable* [n];
+
+	list[0] = new Sphere(glm::vec3(0.f, 0.f, -1.f), 0.5f, new Lambertian(glm::vec3(0.1f, 0.2f, 0.5f)));
+	list[1] = new Sphere(glm::vec3(0.f, -100.5f, -1.f), 100.f, new Lambertian(glm::vec3(0.8f, 0.8f, 0.0f)));
+	list[2] = new Sphere(glm::vec3(1.f, 0.f, -1.f), 0.5f, new Metal(glm::vec3(0.8f, 0.6f, 0.2f), 0.3f));
+	list[3] = new Sphere(glm::vec3(-1.f, 0.f, -1.f), 0.5f, new Dielectric(1.5f));
+
+	return new HittableList(list, 4);
+}
+
 int main()
 {
 	Renderer* renderer = new Renderer();
 	
-	Hittable* list[] = {
-		new Sphere(glm::vec3(0.f, 0.f, -1.f), 0.5f, new Lambertian(glm::vec3(0.1f, 0.2f, 0.5f))),
-		new Sphere(glm::vec3(0.f, -100.5f, -1.f), 100.f, new Lambertian(glm::vec3(0.8f, 0.8f, 0.0f))),
-		new Sphere(glm::vec3(1.f, 0.f, -1.f), 0.5f, new Metal(glm::vec3(0.8f, 0.6f, 0.2f), 0.3f)),
-		new Sphere(glm::vec3(-1.f, 0.f, -1.f), 0.5f, new Dielectric(1.5f)),
-	};
-	renderer->SetWorld(new HittableList(list, 4));
+	renderer->SetWorld(RandomScene());
 	
-	auto start_running = std::chrono::system_clock::now();
+	const auto start_running = std::chrono::system_clock::now();
 	
 	std::thread rendering_thread([&renderer]
 	{

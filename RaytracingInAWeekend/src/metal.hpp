@@ -11,10 +11,10 @@ public:
 	
 	virtual bool Scatter(const Ray& r_in, const HitRecord& rec, glm::vec3& attenuation, Ray& scattered) const
 	{
-		glm::vec3 reflected = reflect(normalize(r_in.direction),rec.normal);
-		scattered = Ray(rec.p, reflected + fuzz_ * utility::RandomInUnitSphere());
+		glm::vec3 reflected = reflect(normalize(r_in.Direction()),rec.normal);
+		scattered = Ray(rec.p, reflected + fuzz_ * utility::RandomInUnitSphere(), r_in.Time());
 		attenuation = albedo_;
-		return (dot(scattered.direction, rec.normal) > 0);
+		return (dot(scattered.Direction(), rec.normal) > 0);
 	}
 	
 	glm::vec3 albedo_;

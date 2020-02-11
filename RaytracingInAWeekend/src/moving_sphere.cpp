@@ -1,11 +1,11 @@
-#include "sphere.hpp"
+#include "moving_sphere.hpp"
 
-bool Sphere::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
+bool MovingSphere::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
 {
-	const auto oc = r.Origin() - center_;
-	const auto a = glm::dot(r.Direction(), r.Direction());
-	const auto b = dot(oc, r.Direction());
-	const auto c = dot(oc, oc) - radius_ * radius_;
+	const glm::vec3 oc = r.Origin() - Center(r.Time());
+	const float a = dot(r.Direction(), r.Direction());
+	const float b = dot(oc, r.Direction());
+	const float c = dot(oc, oc) - radius_ * radius_;
 
 	const float discriminant = b * b - a * c;
 	if (discriminant > 0)
@@ -15,7 +15,7 @@ bool Sphere::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) cons
 		{
 			record.t = t_temp;
 			record.p = r.PointAtParameter(t_temp);
-			record.normal = (record.p - center_) / radius_;
+			record.normal = (record.p - Center(r.Time())) / radius_;
 			record.mat_ptr = material_;
 			return true;
 		}
@@ -25,7 +25,7 @@ bool Sphere::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) cons
 		{
 			record.t = t_temp;
 			record.p = r.PointAtParameter(t_temp);
-			record.normal = (record.p - center_) / radius_;
+			record.normal = (record.p - Center(r.Time())) / radius_;
 			record.mat_ptr = material_;
 			return true;
 		}

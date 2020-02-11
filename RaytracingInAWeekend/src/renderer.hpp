@@ -40,7 +40,8 @@ public:
 		return window_;
 	}
 
-	Camera camera_ = Camera(glm::vec3(5.f, 1.5f, 3.f), glm::vec3(0.f, 1.0f, 0.f), glm::vec3(0.f, 1.f, 0.f), 90.f, static_cast<float>(nx_) / static_cast<float>(ny_), 2.0f, glm::length(glm::vec3(5.f, 1.5f, 3.f) - glm::vec3(0.f, 1.0f, 0.f)));
+	Camera camera_ = Camera(glm::vec3(13.f, 2.f, 3.f), glm::vec3(0.f, 0.0f, 0.f), glm::vec3(0.f, 1.f, 0.f), 20.f,
+		static_cast<float>(nx_) / static_cast<float>(ny_), 0.0f, glm::length(glm::vec3(13.f, 2.f, 3.f) - glm::vec3(0.f, 1.0f, 0.f)), 0.f, 1.f);
 
 	uint32_t GetSamples() const
 	{
@@ -55,8 +56,8 @@ private:
 
 	std::atomic<bool> did_render_ = false;
 
-	static const uint16_t nx_ = 1920;
-	static const uint16_t ny_ = 1080;
+	static const uint16_t nx_ = 1280;
+	static const uint16_t ny_ = 720;
 	float* img_data_;
 
 	std::atomic<uint32_t> samples_ = 0;
@@ -67,7 +68,6 @@ private:
 	GLFWwindow* window_ = nullptr;
 	unsigned int vbo_ = 0;
 	unsigned int vao_ = 0;
-	unsigned int vertex_shader_ = 0;
 	unsigned int render_texture_ = 0;
 	unsigned int shader_program_ = 0;
 	unsigned int samples_uniform_ = 0;

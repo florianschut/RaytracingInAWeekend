@@ -8,15 +8,16 @@
 class Camera 
 {
 public:
-	Camera(glm::vec3 look_from, glm::vec3 look_at, glm::vec3 up_vec, float v_fov, float aspect_ratio, float aperture, float focus_distance);
+	Camera(glm::vec3 look_from, glm::vec3 look_at, glm::vec3 up_vec, float v_fov, float aspect_ratio, float aperture, float focus_distance, float time0, float time1);
 	
 	Ray GetRay(float x, float y)
 	{
+		float time = time0_ + utility::RandomFloat() * (time1_ - time0_);
 		if (lens_radius_ == 0.0f)
-			return Ray(origin_, lower_left_corner_ + x * horizontal_ + y * vertical_ - origin_);
+			return Ray(origin_, lower_left_corner_ + x * horizontal_ + y * vertical_ - origin_, time);
 		glm::vec3 ray_dir = lens_radius_ * utility::RandomInUnitDisc();
 		glm::vec3 offset = u_ * ray_dir.x + v_ * ray_dir.y;
-		return Ray(origin_ + offset, lower_left_corner_ + x * horizontal_ + y * vertical_ - origin_ - offset);
+		return Ray(origin_ + offset, lower_left_corner_ + x * horizontal_ + y * vertical_ - origin_ - offset, time);
 	}
 
 	glm::vec3 GetOrigin() const
@@ -45,4 +46,5 @@ private:
 	float half_width_;
 	float lens_radius_;
 	float focus_distance_;
+	float time0_, time1_;
 };

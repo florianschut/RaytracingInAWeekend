@@ -27,9 +27,9 @@ Renderer::Renderer()
 Renderer::~Renderer()
 {
 	glfwTerminate();
-	const int array_size = nx_ * ny_ * 3;
-	uint8_t* output_img = new uint8_t[array_size];
-	for (int i = 0; i < array_size; i++)
+	const auto array_size = nx_ * ny_ * 3;
+	const auto output_img = new uint8_t[array_size];
+	for (auto i = 0; i < array_size; i++)
 		output_img[i] = static_cast<uint8_t>(254.99 * sqrt(img_data_[i] / static_cast<float>(samples_)));
 
 	stbi_write_bmp("output.bmp", nx_, ny_, 3, output_img);
@@ -57,7 +57,7 @@ glm::vec3 Renderer::Color(const Ray& r, Hittable* world, unsigned int depth)
 	}
 	else
 	{
-		const glm::vec3 unit_direction = normalize(r.direction);
+		const glm::vec3 unit_direction = normalize(r.Direction());
 		float t = 0.5f * (unit_direction.y + 1.0f);
 		return (1.0f - t) * glm::vec3(1.f, 1.f, 1.f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
 	}
@@ -83,13 +83,13 @@ void Renderer::RenderFrames()
 	}
 
 	unsigned int y = 0;
-	const unsigned int num_cores = std::thread::hardware_concurrency();
-	std::future<void>* futures = new std::future<void>[num_cores];
+	const auto num_cores = std::thread::hardware_concurrency();
+	const auto futures = new std::future<void>[num_cores];
 
 	for (uint8_t i = 0; i < num_cores; i++)
 	{
 		futures[i] = std::async([=] {RenderSingleLine(y, img_data_, world_, camera_); });
-		y++;
+		++y;
 	}
 	while (y < ny_)
 	{
@@ -98,7 +98,7 @@ void Renderer::RenderFrames()
 			if (futures[i].wait_for(std::chrono::milliseconds(0)) == std::future_status::ready && y < ny_)
 			{
 				futures[i] = std::async([=] {RenderSingleLine(y, img_data_, world_, camera_); });
-				y++;
+				++y;
 			}
 		}
 	}
@@ -107,7 +107,7 @@ void Renderer::RenderFrames()
 		futures[i].get();
 	}
 
-	samples_++;
+	++samples_;
 	did_render_ = true;
 	delete[] futures;
 }
@@ -136,7 +136,7 @@ void Renderer::Tick()
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
 
-	ImGuiIO& io = ImGui::GetIO();
+	const auto io = ImGui::GetIO();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
@@ -181,8 +181,7 @@ bool Renderer::InitOpenGL()
 
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_), vertices_, GL_STATIC_DRAW);
 
-	unsigned int vertexShader;
-	vertexShader = glCreateShader(GL_VERTEX_SHADER);
+	const auto vertexShader = glCreateShader(GL_VERTEX_SHADER);
 	glShaderSource(vertexShader, 1, &vertex_shader_source_, nullptr);
 	glCompileShader(vertexShader);
 
@@ -198,8 +197,7 @@ bool Renderer::InitOpenGL()
 		return false;
 	}
 
-	unsigned int fragmentShader;
-	fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
+	const auto fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
 	glShaderSource(fragmentShader, 1, &fragment_shader_source_, nullptr);
 	glCompileShader(fragmentShader);
 
@@ -249,11 +247,11 @@ bool Renderer::InitOpenGL()
 void Renderer::RenderSingleLine(unsigned int y, float* img_data, Hittable* world, Camera& camera)
 {
 	std::atomic_uint n = (ny_ - 1 - y) * nx_ * 3u;
-	float v = (static_cast<float>(y) + utility::RandomFloat()) / static_cast<float>(ny_);
+	const auto v = (static_cast<float>(y) + utility::RandomFloat()) / static_cast<float>(ny_);
 	for (int x = 0; x < nx_; x++)
 	{
-		float u = (static_cast<float>(x) + utility::RandomFloat()) / static_cast<float>(nx_);
-		glm::vec3 col = Color(camera.GetRay(u, v), world, 0);
+		const auto u = (static_cast<float>(x) + utility::RandomFloat()) / static_cast<float>(nx_);
+		const auto col = Color(camera.GetRay(u, v), world, 0);
 		img_data[n++] += col.r;
 		img_data[n++] += col.g;
 		img_data[n++] += col.b;

@@ -2,7 +2,8 @@
 
 #include <corecrt_math_defines.h>
 
-Camera::Camera(glm::vec3 lookfrom, glm::vec3 lookat, glm::vec3 upVec, float vfov, float aspect_ratio, float aperture, float focus_distance)
+Camera::Camera(glm::vec3 lookfrom, glm::vec3 lookat, glm::vec3 upVec, float vfov, float aspect_ratio, float aperture, float focus_distance, float time0, float time1):
+time0_(time0), time1_(time1)
 {
 	lens_radius_ = aperture * 0.5f;
 	focus_distance_ = focus_distance;

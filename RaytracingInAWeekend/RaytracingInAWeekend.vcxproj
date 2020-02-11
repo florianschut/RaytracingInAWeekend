@@ -29,6 +29,7 @@
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\hittable_list.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\moving_sphere.cpp" />
     <ClCompile Include="src\renderer.cpp" />
     <ClCompile Include="src\sphere.cpp" />
   </ItemGroup>
@@ -47,6 +48,7 @@
     <ClInclude Include="src\lambertian.hpp" />
     <ClInclude Include="src\material.hpp" />
     <ClInclude Include="src\metal.hpp" />
+    <ClInclude Include="src\moving_sphere.hpp" />
     <ClInclude Include="src\random.hpp" />
     <ClInclude Include="src\ray.hpp" />
     <ClInclude Include="src\renderer.hpp" />
