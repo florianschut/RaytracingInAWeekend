@@ -12,7 +12,7 @@ public:
 	
 	Ray GetRay(float x, float y)
 	{
-		glm::vec3 ray_dir = lens_radius_ * utility::RandomInUnitSphere();
+		glm::vec3 ray_dir = lens_radius_ * utility::RandomInUnitDisc();
 		glm::vec3 offset = u_ * ray_dir.x + v_ * ray_dir.y;
 		return Ray(origin_ + offset, lower_left_corner_ + x * horizontal_ + y * vertical_ - origin_ - offset);
 	}

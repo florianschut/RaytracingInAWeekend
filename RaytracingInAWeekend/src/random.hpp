@@ -27,4 +27,14 @@ namespace utility
 
 		return retval;
 	}
+
+	inline glm::vec3 RandomInUnitDisc()
+	{
+		glm::vec3 retval;
+		do
+		{
+			retval = 2.0f * glm::vec3(RandomFloat(), RandomFloat(), 0.f) - glm::vec3(1.f, 1.f, 0.f);
+		} while (glm::dot(retval, retval) >= 1.0);
+		return retval;
+	}
 }

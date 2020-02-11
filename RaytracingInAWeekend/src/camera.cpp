@@ -22,7 +22,7 @@ void Camera::SetOrigin(glm::vec3 new_origin)
 	w_ = normalize(origin_ - look_at_);
 	u_ = normalize(cross(up_, w_));
 	v_ = cross(w_, u_);
-	lower_left_corner_ = origin_ - half_width_ * u_ - half_height_ * v_ - focus_distance_ * w_;
+	lower_left_corner_ = origin_ - half_width_ * focus_distance_* u_ - half_height_ * focus_distance_ * v_ - focus_distance_ * w_;
 
 	horizontal_ = 2.f * half_width_ * focus_distance_ * u_;
 	vertical_ = 2.f * half_height_ * focus_distance_ * v_;
