@@ -1,4 +1,5 @@
 #include "moving_sphere.hpp"
+#include "aabb.hpp"
 
 bool MovingSphere::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
 {
@@ -31,4 +32,12 @@ bool MovingSphere::Hit(const Ray& r, float t_min, float t_max, HitRecord& record
 		}
 	}
 	return false;
+}
+
+bool MovingSphere::BoundingBox(float time0, float time1, AABB& box) const
+{
+	AABB box0(Center(time0) - glm::vec3(radius_), Center(time0) + glm::vec3(radius_));
+	AABB box1(Center(time1) - glm::vec3(radius_), Center(time1) + glm::vec3(radius_));
+	box = AABB::SurroundingBox(box0, box1);
+	return true;
 }

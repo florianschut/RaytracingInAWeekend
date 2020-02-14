@@ -12,6 +12,7 @@
 #include "metal.hpp"
 #include "lambertian.hpp"
 #include "dielectric.hpp"
+#include "bvh_node.hpp"
 
 Hittable* RandomScene()
 {
@@ -67,7 +68,7 @@ Hittable* RandomScene()
 	list[i++] = new Sphere(glm::vec3(0.f, 1.f, 0.f), 1.0f, new Dielectric(1.5f));
 	list[i++] = new Sphere(glm::vec3(-4.f, 1.f, 0.f), 1.f, new Lambertian(glm::vec3(0.91f, 0.13f, 0.15f)));
 	list[i++] = new Sphere(glm::vec3(4.f, 1.f, 0.f), 1.f, new Metal(glm::vec3(0.7f, 0.6f, 0.5f), 0.0f));
-	return new HittableList(list, i);
+	return new BvhNode(list, i, 0.0f, 1.f);
 }
 
 Hittable* SimpleScene()
@@ -80,14 +81,14 @@ Hittable* SimpleScene()
 	list[2] = new Sphere(glm::vec3(1.f, 0.f, -1.f), 0.5f, new Metal(glm::vec3(0.8f, 0.6f, 0.2f), 0.3f));
 	list[3] = new Sphere(glm::vec3(-1.f, 0.f, -1.f), 0.5f, new Dielectric(1.5f));
 
-	return new HittableList(list, 4);
+	return new BvhNode( list, 4, 0.f, 1.f);
 }
 
 int main()
 {
 	Renderer* renderer = new Renderer();
 	
-	renderer->SetWorld(RandomScene());
+	renderer->SetWorld(SimpleScene());
 	
 	const auto start_running = std::chrono::system_clock::now();
 	

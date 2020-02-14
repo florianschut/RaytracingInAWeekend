@@ -1,4 +1,5 @@
 #include "sphere.hpp"
+#include "aabb.hpp"
 
 bool Sphere::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
 {
@@ -31,4 +32,10 @@ bool Sphere::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) cons
 		}
 	}
 	return false;
+}
+
+bool Sphere::BoundingBox(const float, const float, AABB& box) const
+{
+	box = AABB(center_ - glm::vec3(radius_), center_ + glm::vec3(radius_));
+	return true;
 }

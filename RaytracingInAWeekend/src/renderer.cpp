@@ -57,8 +57,8 @@ glm::vec3 Renderer::Color(const Ray& r, Hittable* world, unsigned int depth)
 	}
 	else
 	{
-		const glm::vec3 unit_direction = normalize(r.Direction());
-		float t = 0.5f * (unit_direction.y + 1.0f);
+		const auto unit_direction = normalize(r.Direction());
+		const auto t = 0.5f * (unit_direction.y + 1.0f);
 		return (1.0f - t) * glm::vec3(1.f, 1.f, 1.f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
 	}
 }
@@ -70,7 +70,7 @@ bool Renderer::WindowShouldClose() const
 
 void Renderer::RenderFrames()
 {
-	if (did_render_ == true) //Don't intervene with texture copy, could and should be handled more efficiently
+	if (did_render_ == true) //Don't intervene with texture copy, could and should probably be handled more efficiently
 		return;
 	
 	if (camera_.did_change_)
