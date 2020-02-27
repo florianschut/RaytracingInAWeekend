@@ -58,9 +58,7 @@ BvhNode::BvhNode(Hittable** list, int n, float time0, float time1)
 		qsort(list, n, sizeof(Hittable*), BoxZCompare);
 
 	if (n == 1)
-	{
 		left_ = right_ = list[0];
-	}
 	else if (n == 2)
 	{
 		left_ = list[0];

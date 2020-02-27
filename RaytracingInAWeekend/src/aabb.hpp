@@ -19,8 +19,8 @@ public:
 		for (auto a = 0; a < 3; a++)
 		{
 			float inv_dir = 1.0f / ray.Direction()[a];
-			auto t0 = (min_[a] - ray.Direction()[a]) * inv_dir;
-			auto t1 = (max_[a] - ray.Direction()[a]) * inv_dir;
+			auto t0 = (min_[a] - ray.Origin()[a]) * inv_dir;
+			auto t1 = (max_[a] - ray.Origin()[a]) * inv_dir;
 			if (inv_dir < 0.f)
 				std::swap(t0, t1);
 			tmin = t0 > tmin ? t0 : tmin;

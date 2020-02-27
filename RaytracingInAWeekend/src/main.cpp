@@ -88,7 +88,7 @@ int main()
 {
 	Renderer* renderer = new Renderer();
 	
-	renderer->SetWorld(SimpleScene());
+	renderer->SetWorld(RandomScene());
 	
 	const auto start_running = std::chrono::system_clock::now();
 	
