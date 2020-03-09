@@ -88,43 +88,22 @@ bool BvhNode::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) con
 		if (hit_left && hit_right)
 		{
 			if (left_record.t < right_record.t)
-			{
-				if (left_record.mat_ptr != nullptr)
-				{
-					record = left_record;
-					return true;
-				}
-				if(right_record.mat_ptr != nullptr)
-				{
-					record = right_record;
-					return true;
-				}
-				return left_->Hit(r, t_min, t_max, record);
-			}
-			if (right_record.mat_ptr != nullptr)
-			{
+				record = left_record;
+			else
 				record = right_record;
-				return true;
-			}
-			return right_->Hit(r, t_min, t_max, record);
+			
+			return true;
 		}
 		if (hit_left)
 		{
-			if (left_record.mat_ptr != nullptr)
-			{
-				record = left_record;
-				return true;
-			}
-			return left_->Hit(r, t_min, t_max, record);
+
+			record = left_record;
+			return true;
 		}
 		if (hit_right)
 		{
-			if (right_record.mat_ptr != nullptr)
-			{
-				record = right_record;
-				return true;
-			}
-			return right_->Hit(r, t_min, t_max, record);
+			record = right_record;
+			return true;
 		}
 		return false;
 	}

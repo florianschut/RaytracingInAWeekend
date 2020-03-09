@@ -8,6 +8,7 @@ public:
 	bool Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const override;
 	bool BoundingBox(const float time0, const float time1, AABB& box) const override;
 
+	static void UV(const glm::vec3& p, float& u, float& v);
 private:
 	glm::vec3 center_;
 	float radius_;

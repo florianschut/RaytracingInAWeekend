@@ -19,6 +19,9 @@
     <Filter Include="ThirdParty\ImGui">
       <UniqueIdentifier>{e15e8c8a-554c-4790-9253-f302fdb7f211}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Matterials">
+      <UniqueIdentifier>{0ef2d048-6465-42e4-846c-bb7e480a0e95}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\ThirdParty\glad\src\glad.c">
@@ -92,22 +95,10 @@
     <ClInclude Include="src\camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\dielectric.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\hittable.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\hittable_list.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\lambertian.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\material.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\metal.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\random.hpp">
@@ -129,6 +120,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\bvh_node.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\textures.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\dielectric.hpp">
+      <Filter>Header Files\Matterials</Filter>
+    </ClInclude>
+    <ClInclude Include="src\diffuse_light.hpp">
+      <Filter>Header Files\Matterials</Filter>
+    </ClInclude>
+    <ClInclude Include="src\lambertian.hpp">
+      <Filter>Header Files\Matterials</Filter>
+    </ClInclude>
+    <ClInclude Include="src\material.hpp">
+      <Filter>Header Files\Matterials</Filter>
+    </ClInclude>
+    <ClInclude Include="src\metal.hpp">
+      <Filter>Header Files\Matterials</Filter>
+    </ClInclude>
+    <ClInclude Include="src\perlin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

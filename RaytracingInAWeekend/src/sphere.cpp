@@ -1,4 +1,7 @@
 #include "sphere.hpp"
+
+#include <corecrt_math_defines.h>
+
 #include "aabb.hpp"
 
 bool Sphere::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
@@ -18,6 +21,7 @@ bool Sphere::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) cons
 			record.p = r.PointAtParameter(t_temp);
 			record.normal = (record.p - center_) / radius_;
 			record.mat_ptr = material_;
+			UV((record.p - center_) / radius_, record.u, record.v);
 			return true;
 		}
 
@@ -38,4 +42,12 @@ bool Sphere::BoundingBox(const float, const float, AABB& box) const
 {
 	box = AABB(center_ - glm::vec3(radius_), center_ + glm::vec3(radius_));
 	return true;
+}
+
+void Sphere::UV(const glm::vec3& p, float& u, float& v)
+{
+	float phi = atan2(p.z, p.x);
+	float theta = asin(p.y);
+	u = 1.f - (phi + static_cast<float>(M_PI)) / (2.f * static_cast<float>(M_PI));
+	v = (theta + static_cast<float>(M_PI_2)) / static_cast<float>(M_PI);
 }

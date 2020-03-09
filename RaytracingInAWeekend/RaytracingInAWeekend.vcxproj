@@ -47,16 +47,19 @@
     <ClInclude Include="src\bvh_node.hpp" />
     <ClInclude Include="src\camera.hpp" />
     <ClInclude Include="src\dielectric.hpp" />
+    <ClInclude Include="src\diffuse_light.hpp" />
     <ClInclude Include="src\hittable.hpp" />
     <ClInclude Include="src\hittable_list.hpp" />
     <ClInclude Include="src\lambertian.hpp" />
     <ClInclude Include="src\material.hpp" />
     <ClInclude Include="src\metal.hpp" />
     <ClInclude Include="src\moving_sphere.hpp" />
+    <ClInclude Include="src\perlin.h" />
     <ClInclude Include="src\random.hpp" />
     <ClInclude Include="src\ray.hpp" />
     <ClInclude Include="src\renderer.hpp" />
     <ClInclude Include="src\sphere.hpp" />
+    <ClInclude Include="src\textures.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
