@@ -46,21 +46,12 @@ glm::vec3 Renderer::Color(const Ray& r, Hittable* world, unsigned int depth)
 	{
 		Ray scattered;
 		glm::vec3 attenuation;
+		glm::vec3 emitted = record.mat_ptr->Emitted(record.u, record.v, record.p);
 		if (depth < max_depth_ && record.mat_ptr->Scatter(r, record, attenuation, scattered))
-		{
-			return attenuation * Color(scattered, world, depth + 1);
-		}
-		else
-		{
-			return glm::vec3(0.f);
-		}
+			return emitted + attenuation * Color(scattered, world, depth + 1);
+		return emitted;
 	}
-	else
-	{
-		const auto unit_direction = normalize(r.Direction());
-		const auto t = 0.5f * (unit_direction.y + 1.0f);
-		return (1.0f - t) * glm::vec3(1.f, 1.f, 1.f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
-	}
+	return glm::vec3(0.f);
 }
 
 bool Renderer::WindowShouldClose() const

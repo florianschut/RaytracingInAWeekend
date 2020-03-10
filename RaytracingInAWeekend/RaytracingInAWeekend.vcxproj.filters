@@ -143,5 +143,8 @@
     <ClInclude Include="src\perlin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\rectangle.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
