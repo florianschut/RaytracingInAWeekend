@@ -20,7 +20,7 @@ private:
 	float x0_, x1_, y0_, y1_, k_;
 };
 
-bool XYRect::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
+inline bool XYRect::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
 {
 	float t = (k_ - r.Origin().z) / r.Direction().z;
 	if (t < t_min || t > t_max)
@@ -55,7 +55,7 @@ private:
 	float x0_, x1_, z0_, z1_, k_;
 };
 
-bool XZRect::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
+inline bool XZRect::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
 {
 	float t = (k_ - r.Origin().y) / r.Direction().y;
 	if (t < t_min || t > t_max)
@@ -91,7 +91,7 @@ private:
 	float y0_, y1_, z0_, z1_, k_;
 };
 
-bool YZRect::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
+inline bool YZRect::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
 {
 	float t = (k_ - r.Origin().x) / r.Direction().x;
 	if (t < t_min || t > t_max)

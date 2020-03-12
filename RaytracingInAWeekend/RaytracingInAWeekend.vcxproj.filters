@@ -22,6 +22,9 @@
     <Filter Include="Header Files\Matterials">
       <UniqueIdentifier>{0ef2d048-6465-42e4-846c-bb7e480a0e95}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Hittables">
+      <UniqueIdentifier>{e892aa33-e1b9-48f2-9801-8c267498c428}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\ThirdParty\glad\src\glad.c">
@@ -69,6 +72,12 @@
     <ClCompile Include="src\bvh_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\box.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\instance.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ThirdParty\ImGui\imconfig.h">
@@ -95,31 +104,16 @@
     <ClInclude Include="src\camera.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\hittable.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\hittable_list.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\random.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\ray.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\sphere.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\renderer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\moving_sphere.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\aabb.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\bvh_node.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\textures.hpp">
@@ -143,8 +137,32 @@
     <ClInclude Include="src\perlin.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\hittable.hpp">
+      <Filter>Header Files\Hittables</Filter>
+    </ClInclude>
+    <ClInclude Include="src\hittable_list.hpp">
+      <Filter>Header Files\Hittables</Filter>
+    </ClInclude>
+    <ClInclude Include="src\moving_sphere.hpp">
+      <Filter>Header Files\Hittables</Filter>
+    </ClInclude>
+    <ClInclude Include="src\bvh_node.hpp">
+      <Filter>Header Files\Hittables</Filter>
+    </ClInclude>
     <ClInclude Include="src\rectangle.hpp">
+      <Filter>Header Files\Hittables</Filter>
+    </ClInclude>
+    <ClInclude Include="src\sphere.hpp">
+      <Filter>Header Files\Hittables</Filter>
+    </ClInclude>
+    <ClInclude Include="src\box.hpp">
+      <Filter>Header Files\Hittables</Filter>
+    </ClInclude>
+    <ClInclude Include="src\scenes.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\instance.hpp">
+      <Filter>Header Files\Hittables</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
