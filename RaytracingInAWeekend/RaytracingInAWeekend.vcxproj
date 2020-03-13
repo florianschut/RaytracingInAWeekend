@@ -54,6 +54,7 @@
     <ClInclude Include="src\hittable.hpp" />
     <ClInclude Include="src\hittable_list.hpp" />
     <ClInclude Include="src\instance.hpp" />
+    <ClInclude Include="src\isotropic.hpp" />
     <ClInclude Include="src\lambertian.hpp" />
     <ClInclude Include="src\material.hpp" />
     <ClInclude Include="src\metal.hpp" />
@@ -66,6 +67,7 @@
     <ClInclude Include="src\scenes.hpp" />
     <ClInclude Include="src\sphere.hpp" />
     <ClInclude Include="src\textures.hpp" />
+    <ClInclude Include="src\volumes.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

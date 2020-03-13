@@ -164,5 +164,11 @@
     <ClInclude Include="src\instance.hpp">
       <Filter>Header Files\Hittables</Filter>
     </ClInclude>
+    <ClInclude Include="src\volumes.hpp">
+      <Filter>Header Files\Hittables</Filter>
+    </ClInclude>
+    <ClInclude Include="src\isotropic.hpp">
+      <Filter>Header Files\Matterials</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

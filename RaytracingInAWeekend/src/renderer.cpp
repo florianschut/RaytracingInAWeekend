@@ -30,8 +30,9 @@ Renderer::~Renderer()
 	const auto array_size = nx_ * ny_ * 3;
 	const auto output_img = new uint8_t[array_size];
 	for (auto i = 0; i < array_size; i++)
-		output_img[i] = static_cast<uint8_t>(254.99 * sqrt(img_data_[i] / static_cast<float>(samples_)));
-
+	{
+		output_img[i] = static_cast<uint8_t>(255.99f * sqrt(std::min(img_data_[i] / static_cast<float>(samples_), 1.f)));
+	}
 	stbi_write_bmp("output.bmp", nx_, ny_, 3, output_img);
 	delete[] img_data_;
 	delete[] output_img;

@@ -7,7 +7,7 @@ class Texture
 {
 public:
 	virtual glm::vec3 Value(float u, float v, const glm::vec3& p) const = 0;
-	glm::vec3 value(const glm::vec2 uv, const glm::vec3& p) const { return Value(uv.x, uv.y, p); };
+	glm::vec3 Value(const glm::vec2 uv, const glm::vec3& p) const { return Value(uv.x, uv.y, p); };
 };
 
 class ConstantTexture: public Texture
