@@ -48,8 +48,9 @@ glm::vec3 Renderer::Color(const Ray& r, Hittable* world, unsigned int depth)
 		Ray scattered;
 		glm::vec3 attenuation;
 		glm::vec3 emitted = record.mat_ptr->Emitted(record.u, record.v, record.p);
-		if (depth < max_depth_ && record.mat_ptr->Scatter(r, record, attenuation, scattered))
-			return emitted + attenuation * Color(scattered, world, depth + 1);
+		float pdf = 0.f;
+		if (depth < max_depth_ && record.mat_ptr->Scatter(r, record, attenuation, scattered, pdf))
+			return emitted + attenuation * record.mat_ptr->ScatteringPdf(r, record, scattered) * Color(scattered, world, depth + 1)/pdf;
 		return emitted;
 	}
 	return glm::vec3(0.f);

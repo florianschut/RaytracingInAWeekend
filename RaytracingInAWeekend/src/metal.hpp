@@ -12,7 +12,7 @@ public:
 	
 	~Metal() { delete albedo_; };
 	
-	virtual bool Scatter(const Ray& r_in, const HitRecord& rec, glm::vec3& attenuation, Ray& scattered) const
+	virtual bool Scatter(const Ray& r_in, const HitRecord& rec, glm::vec3& attenuation, Ray& scattered, float&) const
 	{
 		glm::vec3 reflected = reflect(normalize(r_in.Direction()),rec.normal);
 		scattered = Ray(rec.p, reflected + fuzz_ * utility::RandomInUnitSphere(), r_in.Time());

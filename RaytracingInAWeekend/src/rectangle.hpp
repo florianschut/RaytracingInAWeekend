@@ -51,8 +51,8 @@ public:
 	};
 
 private:
-	Material* material_;
 	float x0_, x1_, z0_, z1_, k_;
+	Material* material_;
 };
 
 inline bool XZRect::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const

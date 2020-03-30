@@ -40,7 +40,7 @@ public:
 		return window_;
 	}
 
-	Camera camera_ = Camera(glm::vec3(278, 278, -800.f), glm::vec3(278, 278, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.f,
+	Camera camera_ = Camera(glm::vec3(800, 278, -525.f), glm::vec3(278, 278, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.f,
 		static_cast<float>(nx_) / static_cast<float>(ny_), 0.0f, glm::length(glm::vec3(13.f, 2.f, 3.f) - glm::vec3(0.f, 1.0f, 0.f)), 0.f, 1.f);
 
 	uint32_t GetSamples() const

@@ -14,6 +14,7 @@
 #include "box.hpp"
 #include "instance.hpp"
 #include "volumes.hpp"
+#include "hittable_list.hpp"
 
 namespace scene
 {
@@ -106,24 +107,76 @@ namespace scene
 		return new BvhNode(list, n, 0.f, 0.f);
 	}
 
-	Hittable* CornelScene()
+	Hittable* CornelScene(Camera& camera, float aspect)
 	{
 		auto list = new Hittable * [8];
 		int i = 0;
 		Material* red = new Lambertian(new ConstantTexture(glm::vec3(0.65, 0.05, 0.05)));
-		Material* white = new Lambertian(new ConstantTexture(glm::vec3(0.73, 0.73, 0.73)));;
-		Material* green = new Lambertian(new ConstantTexture(glm::vec3(0.12, 0.45, 0.15)));;
-		Material* light = new DiffuseLight(new ConstantTexture(glm::vec3(7)));
-
+		Material* white = new Lambertian(new ConstantTexture(glm::vec3(0.73, 0.73, 0.73)));
+		Material* green = new Lambertian(new ConstantTexture(glm::vec3(0.12, 0.45, 0.15)));
+		Material* light = new DiffuseLight(new ConstantTexture(glm::vec3(15)));
+		
 		list[i++] = new FlipNormals(new YZRect(0, 555, 0, 555, 555, green));
 		list[i++] = new YZRect(0, 555, 0, 555, 0, red);
-		list[i++] = new XZRect(113, 443, 127, 432, 554, light);
+		//list[i++] = new XZRect(113, 443, 127, 432, 554, light);
+		list[i++] = new XZRect(213, 343, 227, 332, 554, light);
 		list[i++] = new FlipNormals(new XZRect(0, 555, 0, 555, 555, white));
 		list[i++] = new XZRect(0, 555, 0, 555, 0, white);
 		list[i++] = new FlipNormals(new XYRect(0, 555, 0, 555, 555, white));
-		list[i++] = new ConstantMedium( new Translate(new RotateY( new Box(glm::vec3(0, 0, 0), glm::vec3(165, 165, 165), white), -18.f), glm::vec3(130, 0, 65)), 0.01f, new ConstantTexture(glm::vec3(1.f)));
-		list[i++] = new ConstantMedium( new Translate(new RotateY( new Box(glm::vec3(0, 0, 0), glm::vec3(165, 330, 165), white), 15.f), glm::vec3(265, 0, 295)), 0.01f, new ConstantTexture(glm::vec3(0.f)));
-
+		list[i++] = new Translate(new RotateY( new Box(glm::vec3(0, 0, 0), glm::vec3(165, 165, 165), white), -18.f), glm::vec3(130, 0, 65)), 0.01f, new ConstantTexture(glm::vec3(1.f));
+		list[i++] = new Translate(new RotateY( new Box(glm::vec3(0, 0, 0), glm::vec3(165, 330, 165), white), 15.f), glm::vec3(265, 0, 295)), 0.01f, new ConstantTexture(glm::vec3(0.f));
+		camera = Camera(glm::vec3(278, 278, -800), glm::vec3(278, 278, 0), glm::vec3(0, 1, 0), 40.0, aspect, 0.0, 10.0, 0, 1);
 		return new BvhNode(list, i, 0.f, 0.f);
 	}
+
+	Hittable* TheNextWeek()
+	{
+		int nb = 20;
+		Hittable** list = new Hittable * [30];
+		Hittable** box_list = new Hittable * [400];
+		Hittable** box_list2 = new Hittable * [1000];
+
+		Material* white = new Lambertian(new ConstantTexture(glm::vec3(0.73, 0.73, 0.73)));
+		Material* ground = new Lambertian(new ConstantTexture(glm::vec3(0.48, 0.83, 0.53)));
+		Material* light = new DiffuseLight(new ConstantTexture(glm::vec3(7)));
+
+		int b = 0;
+		for (int i = 0; i < nb; i++)
+		{
+			for (int j = 0; j < nb; j++)
+			{
+				float w = 100.f;
+				float x0 = -1000.f + static_cast<float>(i) * w;
+				float z0 = -1000.f + static_cast<float>(j) * w;
+				float y0 = 0;
+				float x1 = x0 + w;
+				float y1 = 100.f * (utility::RandomFloat() + 0.01f);
+				float z1 = z0 + w;
+				box_list[b++] = new Box(glm::vec3(x0, y0, z0), glm::vec3(x1, y1, z1), ground);
+			}
+		}
+
+		glm::vec3 center(400, 400, 200);
+		int l = 0;
+		list[l++] = new BvhNode(box_list, b, 0, 1);
+		list[l++] = new XZRect(123, 423, 147, 412, 554, light);
+		list[l++] = new MovingSphere(center, center + glm::vec3(30, 0, 0), 0, 1, 50.f, new Lambertian(new ConstantTexture(glm::vec3(0.7f, 0.3f, 0.1f))));
+		list[l++] = new Sphere(glm::vec3(260, 150, 45), 50, new Dielectric(1.5f));
+		list[l++] = new Sphere(glm::vec3(0, 150, 140), 50.0f, new Metal(new ConstantTexture(glm::vec3(0.8f, 0.8f, 0.9f)), 10.0f));
+		Hittable* boundry = new Sphere(glm::vec3(360, 150, 145), 70, new Dielectric(1.5));
+		list[l++] = boundry;
+		list[l++] = new ConstantMedium(boundry, 0.2f, new ConstantTexture(glm::vec3(0.2f, 0.4f, 0.9f)));
+		boundry = new Sphere(glm::vec3(0,0,0), 5000, new Dielectric(1.5));
+		list[l++] = new ConstantMedium(boundry, 0.0001f, new ConstantTexture(glm::vec3(0.2f, 0.4f, 0.9f)));
+		int nx, ny, nn;
+		unsigned char* texture_data = stbi_load("earthmap.jpg", &nx, &ny, &nn, 0);
+		Material* emat = new Lambertian(new ImageTexture(texture_data, nx, ny));
+		list[l++] = new Sphere(glm::vec3(400, 200, 400), 100, emat);
+		int ns = 1000;
+		for (int j = 0; j < ns; j++)
+			box_list2[j] = new Sphere(glm::vec3(165 * utility::RandomFloat(), 165 * utility::RandomFloat(), 165 * utility::RandomFloat()), 10, white);
+		list[l++] = new Translate(new RotateY(new BvhNode(box_list2, ns, 0.0, 1.0), 15), glm::vec3(-100, 270, 395));
+		return new BvhNode(list, l, 0.0, 1.0);	
+	}
+	
 }

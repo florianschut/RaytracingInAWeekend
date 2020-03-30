@@ -22,7 +22,7 @@ private:
 inline bool ConstantMedium::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
 {
 	// Print occasional samples when debugging. To enable, set enableDebug true.
-	const bool enableDebug = true;
+	const bool enableDebug = false;
 	bool debugging = enableDebug && utility::RandomFloat() < 0.00001;
 	HitRecord rec1, rec2;
 

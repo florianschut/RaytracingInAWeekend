@@ -12,7 +12,7 @@ int main()
 {
 	Renderer* renderer = new Renderer();
 	
-	renderer->SetWorld(scene::CornelScene());
+	renderer->SetWorld(scene::CornelScene(renderer->camera_, 16.f/9.f));
 	
 	const auto start_running = std::chrono::system_clock::now();
 	
