@@ -8,9 +8,11 @@ public:
 	DiffuseLight(Texture* color = new ConstantTexture(glm::vec3(1.f))): color_(color){};
 
 	bool Scatter(const Ray&, const HitRecord&, glm::vec3&, Ray&, float&) const override { return false; }
-	virtual glm::vec3 Emitted(float u , float v, const glm::vec3& p) const
+	virtual glm::vec3 Emitted(const Ray&, const HitRecord& rec) const
 	{
-		return color_->Value(u, v, p);
+		if(rec.front_face)
+			return color_->Value(rec.u, rec.v, rec.p);
+		return glm::vec3(0);
 	}
 
 private:

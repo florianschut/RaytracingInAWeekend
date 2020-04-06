@@ -170,5 +170,8 @@
     <ClInclude Include="src\isotropic.hpp">
       <Filter>Header Files\Matterials</Filter>
     </ClInclude>
+    <ClInclude Include="src\ortho_normal_base.hpp">
+      <Filter>Header Files\Hittables</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

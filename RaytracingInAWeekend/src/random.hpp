@@ -36,6 +36,19 @@ namespace utility
 		return glm::vec3(r * cos(a), r * sin(a), z);
 	}
 
+	inline glm::vec3 RandomCosineDirection()
+	{
+		auto r1 = RandomFloat();
+		auto r2 = RandomFloat();
+		auto z = sqrt(1 - r2);
+
+		auto phi = 2 * static_cast<float>(M_PI) * r1;
+		auto x = cos(phi) * sqrt(r2);
+		auto y = sin(phi) * sqrt(r2);
+		return glm::vec3(x, y, z);
+
+	}
+
 	inline glm::vec3 RandomInUnitSphere()
 	{
 		glm::vec3 retval;

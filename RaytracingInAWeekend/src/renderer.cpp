@@ -47,11 +47,29 @@ glm::vec3 Renderer::Color(const Ray& r, Hittable* world, unsigned int depth)
 	{
 		Ray scattered;
 		glm::vec3 attenuation;
-		glm::vec3 emitted = record.mat_ptr->Emitted(record.u, record.v, record.p);
+		glm::vec3 emitted = record.mat_ptr->Emitted(r, record);
 		float pdf = 0.f;
-		if (depth < max_depth_ && record.mat_ptr->Scatter(r, record, attenuation, scattered, pdf))
-			return emitted + attenuation * record.mat_ptr->ScatteringPdf(r, record, scattered) * Color(scattered, world, depth + 1)/pdf;
-		return emitted;
+		if(!record.mat_ptr->Scatter(r, record, attenuation, scattered, pdf))
+			return emitted;
+
+		glm::vec3 on_light = glm::vec3(utility::RandomFloat(213.f, 343.f), 554.f, utility::RandomFloat(227.f, 332.f));
+		glm::vec3 to_light = on_light - record.p;
+		auto distance = length(to_light);
+		auto distance_squared = distance * distance;
+		to_light = normalize(to_light);
+
+		if (dot(to_light, record.normal) < 0.0f)
+			return emitted;
+
+		float light_area = (343 - 213) * (332 - 227);
+		float light_cosine = fabs(to_light.y);
+		if (light_cosine < 0.000001f)
+			return emitted;
+		
+		pdf = distance_squared / (light_cosine * light_area);
+		scattered = Ray(record.p, to_light, r.Time());
+
+		return emitted + attenuation * record.mat_ptr->ScatteringPdf(r, record, scattered) * Color(scattered, world, depth + 1)/pdf;
 	}
 	return glm::vec3(0.f);
 }

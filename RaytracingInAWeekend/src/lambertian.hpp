@@ -5,6 +5,7 @@
 
 #include "random.hpp"
 #include "textures.hpp"
+#include "ortho_normal_base.hpp"
 
 class Lambertian :public Material
 {
@@ -14,10 +15,12 @@ public:
 	
 	virtual bool Scatter(const Ray& r_in, const HitRecord& rec, glm::vec3& attenuation, Ray& scattered, float& pdf) const
 	{
-		glm::vec3 target = glm::normalize(rec.normal + utility::RandomUnitVec());
-		scattered = Ray(rec.p, target, r_in.Time());
+		ONB uvw;
+		uvw.BuildFromW(rec.normal);
+		glm::vec3 direction = uvw.Local(utility::RandomCosineDirection());
+		scattered = Ray(rec.p, normalize(direction), r_in.Time());
 		attenuation = albedo_->Value(rec.u, rec.v, rec.p);
-		pdf = glm::dot(rec.normal, scattered.Direction()) / static_cast<float>(M_PI);
+		pdf = glm::dot(uvw.w(), scattered.Direction()) / static_cast<float>(M_PI);
 		return true;
 	}
 

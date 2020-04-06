@@ -119,7 +119,7 @@ namespace scene
 		list[i++] = new FlipNormals(new YZRect(0, 555, 0, 555, 555, green));
 		list[i++] = new YZRect(0, 555, 0, 555, 0, red);
 		//list[i++] = new XZRect(113, 443, 127, 432, 554, light);
-		list[i++] = new XZRect(213, 343, 227, 332, 554, light);
+		list[i++] = new FlipNormals(new XZRect(213, 343, 227, 332, 554, light));
 		list[i++] = new FlipNormals(new XZRect(0, 555, 0, 555, 555, white));
 		list[i++] = new XZRect(0, 555, 0, 555, 0, white);
 		list[i++] = new FlipNormals(new XYRect(0, 555, 0, 555, 555, white));

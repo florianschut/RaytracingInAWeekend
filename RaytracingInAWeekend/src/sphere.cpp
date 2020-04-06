@@ -19,7 +19,8 @@ bool Sphere::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) cons
 		{
 			record.t = t_temp;
 			record.p = r.PointAtParameter(t_temp);
-			record.normal = (record.p - center_) / radius_;
+			const auto outward_normal = (record.p - center_) / radius_;
+			record.SetFaceNormal(r, outward_normal);
 			record.mat_ptr = material_;
 			UV((record.p - center_) / radius_, record.u, record.v);
 			return true;
@@ -30,7 +31,8 @@ bool Sphere::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) cons
 		{
 			record.t = t_temp;
 			record.p = r.PointAtParameter(t_temp);
-			record.normal = (record.p - center_) / radius_;
+			const auto outward_normal = (record.p - center_) / radius_;
+			record.SetFaceNormal(r, outward_normal);
 			record.mat_ptr = material_;
 			return true;
 		}

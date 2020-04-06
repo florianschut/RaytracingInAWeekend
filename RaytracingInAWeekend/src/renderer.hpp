@@ -8,17 +8,6 @@
 
 struct GLFWwindow;
 
-struct ThreadData {
-	ThreadData(uint16_t ny, uint16_t nx, uint16_t spp, Hittable* world, Camera& cam, float* img_data) :
-		ny(ny), nx(nx), spp(spp), world(world), cam(cam), img_data(img_data) {};
-	uint16_t ny;
-	uint16_t nx;
-	uint16_t spp;
-	Hittable* world;
-	Camera& cam;
-	float* img_data;
-};
-
 class Renderer
 {
 public:

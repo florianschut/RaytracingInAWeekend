@@ -34,7 +34,8 @@ inline bool XYRect::Hit(const Ray& r, float t_min, float t_max, HitRecord& recor
 	record.t = t;
 	record.mat_ptr = material_;
 	record.p = r.PointAtParameter(t);
-	record.normal = glm::vec3(0, 0, 1);
+	const auto outward_normal = glm::vec3(0, 0, 1);
+	record.SetFaceNormal(r, outward_normal);
 	return true;
 }
 
@@ -69,7 +70,8 @@ inline bool XZRect::Hit(const Ray& r, float t_min, float t_max, HitRecord& recor
 	record.t = t;
 	record.mat_ptr = material_;
 	record.p = r.PointAtParameter(t);
-	record.normal = glm::vec3(0, 1, 0);
+	const auto outward_normal = glm::vec3(0, 1, 0);
+	record.SetFaceNormal(r, outward_normal);
 	return true;
 }
 
@@ -105,7 +107,8 @@ inline bool YZRect::Hit(const Ray& r, float t_min, float t_max, HitRecord& recor
 	record.t = t;
 	record.mat_ptr = material_;
 	record.p = r.PointAtParameter(t);
-	record.normal = glm::vec3(1, 0, 0);
+	const auto outward_normal = glm::vec3(1, 0, 0);
+	record.SetFaceNormal(r, outward_normal);
 	return true;
 }
 
@@ -118,7 +121,7 @@ public:
 	{
 		if (hittable_->Hit(r, t_min, t_max, record))
 		{
-			record.normal = -record.normal;
+			record.front_face = !record.front_face;
 			return true;
 		}
 		return false;
