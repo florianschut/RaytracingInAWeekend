@@ -2,6 +2,7 @@
 #include "hittable.hpp"
 
 #include "aabb.hpp"
+#include "random.hpp"
 
 class XYRect: public Hittable
 {
@@ -50,6 +51,25 @@ public:
 		box = AABB(glm::vec3(x0_, k_ - 0.0001f, z0_), glm::vec3(x1_, k_ + 0.0001f, z1_));
 		return true;
 	};
+
+	float PdfValue(const glm::vec3& origin, const glm::vec3& v) const override
+	{
+		HitRecord rec;
+		if (!this->Hit(Ray(origin, v), 0.001f, FLT_MAX, rec))
+			return 0;
+		auto area = (x1_ - x0_) * (z1_ - z0_);
+		auto distance_sqared = rec.t * rec.t * length(v) * length(v);
+		auto cosine = fabs(dot(v, rec.normal) / length(v));
+
+		return distance_sqared / (cosine * area);
+	}
+
+	glm::vec3 Random(const glm::vec3& origin) const override
+	{
+		const glm::vec3 random_point = glm::vec3(utility::RandomFloat(x0_, x1_), k_, utility::RandomFloat(z0_, z1_));
+		return random_point - origin;
+	}
+	
 
 private:
 	float x0_, x1_, z0_, z1_, k_;

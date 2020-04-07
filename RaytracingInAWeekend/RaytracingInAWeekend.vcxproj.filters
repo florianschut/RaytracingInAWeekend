@@ -173,5 +173,8 @@
     <ClInclude Include="src\ortho_normal_base.hpp">
       <Filter>Header Files\Hittables</Filter>
     </ClInclude>
+    <ClInclude Include="src\pdf.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

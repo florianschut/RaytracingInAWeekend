@@ -16,6 +16,8 @@
 #include "ray.hpp"
 #include "material.hpp"
 #include "random.hpp"
+#include "pdf.hpp"
+#include "rectangle.hpp"
 
 Renderer::Renderer()
 {
@@ -41,37 +43,32 @@ Renderer::~Renderer()
 
 glm::vec3 Renderer::Color(const Ray& r, Hittable* world, unsigned int depth)
 {
-	HitRecord record;
+	if (depth >= max_depth_)
+		return glm::vec3(0);
+	
+	HitRecord rec;
+	if (!world->Hit(r, 0.001f, FLT_MAX, rec))
+		return glm::vec3(0.f);
 
-	if (world->Hit(r, 0.001f, FLT_MAX, record))
-	{
-		Ray scattered;
-		glm::vec3 attenuation;
-		glm::vec3 emitted = record.mat_ptr->Emitted(r, record);
-		float pdf = 0.f;
-		if(!record.mat_ptr->Scatter(r, record, attenuation, scattered, pdf))
-			return emitted;
+	
+	Ray scattered;
+	glm::vec3 attenuation;
+	glm::vec3 emitted = rec.mat_ptr->Emitted(r, rec);
+	float pdf_val = 0.f;
+	if(!rec.mat_ptr->Scatter(r, rec, attenuation, scattered, pdf_val))
+		return emitted;
+	
+	std::shared_ptr<Hittable> light_shape = std::make_shared<XZRect>(213.f, 343.f, 227.f, 332.f, 554.f, nullptr);
+	HittablePdf light_pdf(light_shape, rec.p);
 
-		glm::vec3 on_light = glm::vec3(utility::RandomFloat(213.f, 343.f), 554.f, utility::RandomFloat(227.f, 332.f));
-		glm::vec3 to_light = on_light - record.p;
-		auto distance = length(to_light);
-		auto distance_squared = distance * distance;
-		to_light = normalize(to_light);
+	CosinePdf cosine_pdf(rec.normal);
+	MixturePdf pdf(&light_pdf, &cosine_pdf);
+	
+	scattered = Ray(rec.p, pdf.Generate(), r.Time());
+	pdf_val = pdf.Value(scattered.Direction());
+	
+	return emitted + attenuation * rec.mat_ptr->ScatteringPdf(r, rec, scattered) * Color(scattered, world, depth + 1) / pdf_val;
 
-		if (dot(to_light, record.normal) < 0.0f)
-			return emitted;
-
-		float light_area = (343 - 213) * (332 - 227);
-		float light_cosine = fabs(to_light.y);
-		if (light_cosine < 0.000001f)
-			return emitted;
-		
-		pdf = distance_squared / (light_cosine * light_area);
-		scattered = Ray(record.p, to_light, r.Time());
-
-		return emitted + attenuation * record.mat_ptr->ScatteringPdf(r, record, scattered) * Color(scattered, world, depth + 1)/pdf;
-	}
-	return glm::vec3(0.f);
 }
 
 bool Renderer::WindowShouldClose() const

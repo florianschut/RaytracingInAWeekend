@@ -60,6 +60,7 @@
     <ClInclude Include="src\metal.hpp" />
     <ClInclude Include="src\moving_sphere.hpp" />
     <ClInclude Include="src\ortho_normal_base.hpp" />
+    <ClInclude Include="src\pdf.hpp" />
     <ClInclude Include="src\perlin.h" />
     <ClInclude Include="src\random.hpp" />
     <ClInclude Include="src\ray.hpp" />

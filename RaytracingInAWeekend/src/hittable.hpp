@@ -26,4 +26,13 @@ public:
 	virtual ~Hittable() = default;
 	virtual bool Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const = 0;
 	virtual bool BoundingBox(const float time0, const float time1, AABB& box) const = 0;
+	virtual float PdfValue(const glm::vec3&, const glm::vec3&) const
+	{
+		return 0.f;
+	}
+
+	virtual glm::vec3 Random(const glm::vec3&) const
+	{
+		return glm::vec3(1, 0, 0);
+	}
 };
