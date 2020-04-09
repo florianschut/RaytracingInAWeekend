@@ -13,14 +13,11 @@ public:
 	Lambertian(Texture* albedo) : albedo_(albedo) {}
 	~Lambertian() { delete albedo_; };
 	
-	virtual bool Scatter(const Ray& r_in, const HitRecord& rec, glm::vec3& attenuation, Ray& scattered, float& pdf) const
+	virtual bool Scatter(const Ray& , const HitRecord& rec, ScatterRecord& srec) const
 	{
-		ONB uvw;
-		uvw.BuildFromW(rec.normal);
-		glm::vec3 direction = uvw.Local(utility::RandomCosineDirection());
-		scattered = Ray(rec.p, normalize(direction), r_in.Time());
-		attenuation = albedo_->Value(rec.u, rec.v, rec.p);
-		pdf = glm::dot(uvw.w(), scattered.Direction()) / static_cast<float>(M_PI);
+		srec.specular = false;
+		srec.attenuation = albedo_->Value(rec.u, rec.v, rec.p);
+		srec.pdf = std::make_shared<CosinePdf>(rec.normal);
 		return true;
 	}
 

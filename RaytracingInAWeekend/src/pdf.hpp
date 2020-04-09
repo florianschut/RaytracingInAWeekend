@@ -56,7 +56,7 @@ private:
 class MixturePdf: public Pdf
 {
 public:
-	MixturePdf(Pdf* p0, Pdf* p1) { p[0] = p0; p[1] = p1; }
+	MixturePdf(std::shared_ptr<Pdf> p0, std::shared_ptr<Pdf> p1) { p[0] = p0; p[1] = p1; }
 
 	float Value(const glm::vec3& direction) const override
 	{
@@ -71,5 +71,5 @@ public:
 	}
 
 private:
-	Pdf* p[2];
+	std::shared_ptr<Pdf> p[2];
 };

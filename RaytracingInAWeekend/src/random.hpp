@@ -11,6 +11,7 @@ namespace utility
 
 	inline float RandomFloat()
 	{
+		//Total over kill for rendering, consider using Xor
 		static std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 		static std::mt19937 generator;
 		static std::function<float()> random_generator =
