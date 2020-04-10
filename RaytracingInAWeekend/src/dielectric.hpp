@@ -28,12 +28,12 @@ class Dielectric: public Material
 public:
 	Dielectric(float reflection_index) : ref_index_(reflection_index) {}
 
-	virtual bool Scatter(const Ray& r_in, const HitRecord& rec, glm::vec3& attenuation, Ray& scattered, float&) const
+	virtual bool Scatter(const Ray& r_in, const HitRecord& rec, ScatterRecord& srec) const
 	{
 		glm::vec3 outward_normal;
 		glm::vec3 reflected = reflect(r_in.Direction(),rec.normal);
 		float ni_over_nt;
-		attenuation = glm::vec3(1.0f, 1.0f, 1.0f);
+		srec.attenuation = glm::vec3(1.0f, 1.0f, 1.0f);
 		glm::vec3 refracted;
 
 		float reflect_prob;
@@ -63,11 +63,11 @@ public:
 
 		if(utility::RandomFloat() < reflect_prob)
 		{
-			scattered = Ray(rec.p, reflected, r_in.Time());
+			srec.specular_ray = Ray(rec.p, reflected, r_in.Time());
 		}
 		else
 		{
-			scattered = Ray(rec.p, refracted, r_in.Time());
+			srec.specular_ray = Ray(rec.p, refracted, r_in.Time());
 		}
 
 		return true;

@@ -7,10 +7,10 @@ class Isotropic : public Material
 public:
 	Isotropic(Texture* albedo): albedo_(albedo){}
 
-	bool Scatter(const Ray&, const HitRecord& rec, glm::vec3& attenuation, Ray& scattered, float&) const
+	bool Scatter(const Ray&, const HitRecord& rec, ScatterRecord& srec) const
 	{
-		scattered = Ray(rec.p, utility::RandomInUnitSphere());
-		attenuation = albedo_->Value(rec.u, rec.v, rec.p);
+		srec.specular_ray = Ray(rec.p, utility::RandomInUnitSphere());
+		srec.attenuation = albedo_->Value(rec.u, rec.v, rec.p);
 		return true;
 	}
 	
