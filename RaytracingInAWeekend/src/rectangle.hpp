@@ -146,7 +146,15 @@ public:
 		}
 		return false;
 	}
+	float PdfValue(const glm::vec3& origin, const glm::vec3& v) const override
+	{
+		return hittable_->PdfValue(origin, v);
+	}
 
+	glm::vec3 Random(const glm::vec3& origin) const override
+	{
+		return hittable_->Random(origin);
+	}
 	bool BoundingBox(const float time0, const float time1, AABB& box) const override
 	{
 		return hittable_->BoundingBox(time0, time1, box);

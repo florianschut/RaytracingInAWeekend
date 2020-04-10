@@ -1,5 +1,6 @@
 #pragma once
 #include "hittable.hpp"
+#include "hittable_list.hpp"
 #include "aabb.hpp"
 
 class Box: public Hittable
@@ -15,11 +16,11 @@ public:
 
 private:
 	glm::vec3 pmin_, pmax_;
-	Hittable* rect_list_;
+	HittableList rect_list_;
 	
 };
 
 inline bool Box::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
 {
-	return rect_list_->Hit(r, t_min, t_max, record);
+	return rect_list_.Hit(r, t_min, t_max, record);
 }

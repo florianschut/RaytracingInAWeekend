@@ -5,11 +5,12 @@
 bool HittableList::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
 {
 	HitRecord temp_record;
-	bool hit_anything = false;
-	float closest_so_far = t_max;
-	for (unsigned int i = 0; i < list_size_; i++)
+	auto hit_anything = false;
+	auto closest_so_far = t_max;
+	
+	for (const auto& object: objects_)
 	{
-		if (list_[i]->Hit(r, t_min, closest_so_far, temp_record))
+		if (object->Hit(r, t_min, closest_so_far, temp_record))
 		{
 			hit_anything = true;
 			closest_so_far = temp_record.t;
@@ -21,16 +22,20 @@ bool HittableList::Hit(const Ray& r, float t_min, float t_max, HitRecord& record
 
 bool HittableList::BoundingBox(const float time0, const float time1, AABB& box) const
 {
-	if (list_size_ < 1) return false;
+	if (objects_.empty()) 
+		return false;
 	AABB temp_box;
-	auto first_true = list_[0]->BoundingBox(time0, time1, temp_box);
-	if (!first_true) return false;
+	const auto first_true = objects_[0]->BoundingBox(time0, time1, temp_box);
+	if (!first_true) 
+		return false;
+	
 	box = temp_box;
-	for (auto i = 1u; i < list_size_; i++)
+	
+	for (const auto& object : objects_)
 	{
-		if (list_[i]->BoundingBox(time0, time1, temp_box))
-			box = AABB::SurroundingBox(box, temp_box);
-		else return false;
+		if (!object->BoundingBox(time0, time1, temp_box))
+			return false;
+		box = AABB::SurroundingBox(box, temp_box);
 	}
 	return true;
 }

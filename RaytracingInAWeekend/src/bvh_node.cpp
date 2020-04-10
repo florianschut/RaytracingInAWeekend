@@ -2,72 +2,59 @@
 #include "random.hpp"
 #include <iostream>
 
-int BoxXCompare(const void* a, const void* b)
+
+inline bool BoxCompare(const std::shared_ptr<Hittable> a, const std::shared_ptr<Hittable> b, int axis)
 {
-	AABB box_left, box_right;
-	Hittable* a_hittable = *(Hittable**)a;
-	Hittable* b_hittable = *(Hittable**)b;
-
-	if (!a_hittable->BoundingBox(0, 0, box_left) || !b_hittable->BoundingBox(0, 0, box_right))
+	AABB box_a, box_b;
+	if (!a->BoundingBox(0, 0, box_a) || !b->BoundingBox(0, 0, box_b))
 		std::cerr << "No bounding box in BvhNode constructor \n";
-
-	if (box_left.Min().x - box_right.Min().x < 0.0f)
-		return -1;
-
-	return 1;
+	return box_a.Min()[axis] < box_b.Min()[axis];
+	
+}
+bool BoxXCompare(const std::shared_ptr<Hittable> a, const std::shared_ptr<Hittable> b)
+{
+	return BoxCompare(a, b, 0);
 }
 
-int BoxYCompare(const void* a, const void* b)
+bool BoxYCompare(const std::shared_ptr<Hittable> a, const std::shared_ptr<Hittable> b)
 {
-	AABB box_left, box_right;
-	Hittable* a_hittable = *(Hittable**)a;
-	Hittable* b_hittable = *(Hittable**)b;
-
-	if (!a_hittable->BoundingBox(0, 0, box_left) || !b_hittable->BoundingBox(0, 0, box_right))
-		std::cerr << "No bounding box in BvhNode constructor \n";
-
-	if (box_left.Min().y - box_right.Min().y < 0.0f)
-		return -1;
-
-	return 1;
+	return BoxCompare(a, b, 1);
 }
 
-int BoxZCompare(const void* a, const void* b)
+bool BoxZCompare(const std::shared_ptr<Hittable> a, const std::shared_ptr<Hittable> b)
 {
-	AABB box_left, box_right;
-	Hittable* a_hittable = *(Hittable**)a;
-	Hittable* b_hittable = *(Hittable**)b;
-
-	if (!a_hittable->BoundingBox(0, 0, box_left) || !b_hittable->BoundingBox(0, 0, box_right))
-		std::cerr << "No bounding box in BvhNode constructor \n";
-
-	if (box_left.Min().z - box_right.Min().z < 0.0f)
-		return -1;
-
-	return 1;
+	return BoxCompare(a, b, 2);
 }
 
-BvhNode::BvhNode(Hittable** list, int n, float time0, float time1)
+BvhNode::BvhNode(std::vector<std::shared_ptr<Hittable>>& objects, size_t start, size_t end, float time0, float time1)
 {
 	auto axis = static_cast<int>(3.f * utility::RandomFloat());
-	if (axis == 0)
-		qsort(list, n, sizeof(Hittable*), BoxXCompare);
-	else if (axis == 1)
-		qsort(list, n, sizeof(Hittable*), BoxYCompare);
-	else
-		qsort(list, n, sizeof(Hittable*), BoxZCompare);
-
-	if (n == 1)
-		left_ = right_ = list[0];
-	else if (n == 2)
+	auto comparator = (axis == 0) ? BoxXCompare
+		: (axis == 1) ? BoxYCompare
+		: BoxZCompare;
+	
+	const size_t object_span = end - start;
+	if (object_span == 1)
+		left_ = right_ = objects[start];
+	else if (object_span == 2)
 	{
-		left_ = list[0];
-		right_ = list[1];
+		if (comparator(objects[start], objects[start + 1]))
+		{
+			left_ = objects[start];
+			right_ = objects[start + 1];
+		}
+		else
+		{
+			left_ = objects[start + 1];
+			right_ = objects[start];
+		}
 	}
 	else
 	{
-		left_ = new BvhNode(list, n / 2, time0, time1);
-		right_ = new BvhNode(list + n / 2, n - n / 2, time0, time1);
+		std::sort(objects.begin() + start, objects.begin() + end, comparator);
+		auto mid = start + object_span / 2;
+		left_ = std::make_shared<BvhNode>(objects, start, mid, time0, time1);
+		right_ = std::make_shared<BvhNode>(objects, mid, end, time0, time1);
 	}
 
 	AABB box_left, box_right;
@@ -75,37 +62,15 @@ BvhNode::BvhNode(Hittable** list, int n, float time0, float time1)
 		std::cerr << "No bounding box in BvhNode constructor \n";
 
 	box_ = AABB::SurroundingBox(box_left, box_right);
-
 }
 
-bool BvhNode::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
+bool BvhNode::Hit(const Ray& r, float t_min, float t_max, HitRecord& rec) const
 {
-	if (box_.Hit(r, t_min, t_max))
-	{
-		HitRecord left_record, right_record;
-		const auto hit_left = left_->Hit(r, t_min, t_max, left_record);
-		const auto hit_right = right_->Hit(r, t_min, t_max, right_record);
-		if (hit_left && hit_right)
-		{
-			if (left_record.t < right_record.t)
-				record = left_record;
-			else
-				record = right_record;
-			
-			return true;
-		}
-		if (hit_left)
-		{
-
-			record = left_record;
-			return true;
-		}
-		if (hit_right)
-		{
-			record = right_record;
-			return true;
-		}
+	if (!box_.Hit(r, t_min, t_max))
 		return false;
-	}
-	return false;
+
+	const auto hit_left = left_->Hit(r, t_min, t_max, rec);
+	const auto hit_right = right_->Hit(r, t_min, hit_left ? rec.t : t_max, rec);
+	
+	return hit_left || hit_right;
 }

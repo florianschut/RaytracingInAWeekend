@@ -18,6 +18,8 @@
 #include "random.hpp"
 #include "pdf.hpp"
 #include "rectangle.hpp"
+#include "textures.hpp"
+#include "diffuse_light.hpp"
 
 Renderer::Renderer()
 {
@@ -38,10 +40,13 @@ Renderer::~Renderer()
 	stbi_write_bmp("output.bmp", nx_, ny_, 3, output_img);
 	delete[] img_data_;
 	delete[] output_img;
-	delete world_;
+#ifdef  _DEBUG
+	if(!world_.unique())
+		std::cerr << "Renderer::world_ is still being referenced!\n";
+#endif
 }
 
-glm::vec3 Renderer::Color(const Ray& r, Hittable* world, unsigned int depth)
+glm::vec3 Renderer::Color(const Ray& r, std::shared_ptr<Hittable> world, std::shared_ptr<Hittable> lights, unsigned int depth)
 {
 	if (depth >= max_depth_)
 		return glm::vec3(0);
@@ -54,15 +59,14 @@ glm::vec3 Renderer::Color(const Ray& r, Hittable* world, unsigned int depth)
 	glm::vec3 emitted = rec.mat_ptr->Emitted(r, rec);
 	if(!rec.mat_ptr->Scatter(r, rec, srec))
 		return emitted;
-	std::shared_ptr<Hittable> light_shape = std::make_shared<XZRect>(213.f, 343.f, 227.f, 332.f, 554.f, nullptr);
 
-	auto light_pdf = std::make_shared<HittablePdf>(light_shape, rec.p);
+	auto light_pdf = std::make_shared<HittablePdf>(lights, rec.p);
 	MixturePdf pdf(light_pdf, srec.pdf);
 
 	Ray scattered = Ray(rec.p, pdf.Generate(), r.Time());
 	auto pdf_val = pdf.Value(scattered.Direction());
 	
-	return emitted + srec.attenuation * rec.mat_ptr->ScatteringPdf(r, rec, scattered) * Color(scattered, world,depth + 1) / pdf_val;
+	return emitted + srec.attenuation * rec.mat_ptr->ScatteringPdf(r, rec, scattered) * Color(scattered, world, lights,depth + 1) / pdf_val;
 }
 
 bool Renderer::WindowShouldClose() const
@@ -114,7 +118,7 @@ void Renderer::RenderFrames()
 	delete[] futures;
 }
 
-void Renderer::SetWorld(Hittable* world)
+void Renderer::SetWorld(std::shared_ptr<Hittable> world)
 {
 	world_ = world;
 }
@@ -246,14 +250,14 @@ bool Renderer::InitOpenGL()
 	return true;
 }
 
-void Renderer::RenderSingleLine(unsigned int y, float* img_data, Hittable* world, std::shared_ptr<Hittable> lights, Camera& camera)
+void Renderer::RenderSingleLine(unsigned int y, float* img_data, std::shared_ptr<Hittable> world, std::shared_ptr<Hittable> lights, Camera& camera)
 {
 	std::atomic_uint n = (ny_ - 1 - y) * nx_ * 3u;
 	const auto v = (static_cast<float>(y) + utility::RandomFloat()) / static_cast<float>(ny_);
 	for (int x = 0; x < nx_; x++)
 	{
 		const auto u = (static_cast<float>(x) + utility::RandomFloat()) / static_cast<float>(nx_);
-		const auto col = Color(camera.GetRay(u, v), world, 0);
+		const auto col = Color(camera.GetRay(u, v), world, lights, 0);
 		img_data[n++] += col.r;
 		img_data[n++] += col.g;
 		img_data[n++] += col.b;

@@ -6,6 +6,7 @@
 
 #include "hittable.hpp"
 #include "camera.hpp"
+#include "hittable_list.hpp"
 
 struct GLFWwindow;
 
@@ -15,16 +16,18 @@ public:
 	Renderer();
 	~Renderer();
 
-	static glm::vec3 Color(const Ray& r, Hittable* world, unsigned int depth);
+	static glm::vec3 Color(const Ray& r, std::shared_ptr<Hittable> world, std::shared_ptr<Hittable> lights, unsigned int depth);
 
 	bool WindowShouldClose() const;
 
 	void RenderFrames();
 
-	void SetWorld(Hittable* world);
+	void SetWorld(std::shared_ptr<Hittable> world);
 
 	void Tick();
 
+	void SetLights(std::shared_ptr<Hittable> lights) { lights_ = lights; }
+	
 	GLFWwindow* GetCurrentWindow() const
 	{
 		return window_;
@@ -40,7 +43,7 @@ public:
 
 private:
 	bool InitOpenGL();
-	static inline void RenderSingleLine(unsigned int y, float* img_data, Hittable* world, std::shared_ptr<Hittable> lights, Camera& camera);
+	static inline void RenderSingleLine(unsigned int y, float* img_data, std::shared_ptr<Hittable> world, std::shared_ptr<Hittable> lights, Camera& camera);
 	void InitImGui();
 	void TickImGui();
 
@@ -53,8 +56,9 @@ private:
 	std::atomic<uint32_t> samples_ = 0;
 	static const uint16_t max_depth_ = 50;
 
-	Hittable* world_ = nullptr;
-
+	std::shared_ptr<Hittable> world_ = nullptr;
+	std::shared_ptr<Hittable> lights_ = nullptr;
+	
 	GLFWwindow* window_ = nullptr;
 	unsigned int vbo_ = 0;
 	unsigned int vao_ = 0;
