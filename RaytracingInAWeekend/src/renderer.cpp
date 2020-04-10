@@ -50,25 +50,19 @@ glm::vec3 Renderer::Color(const Ray& r, Hittable* world, unsigned int depth)
 	if (!world->Hit(r, 0.001f, FLT_MAX, rec))
 		return glm::vec3(0.f);
 
-	
-	Ray scattered;
-	glm::vec3 attenuation;
+	ScatterRecord srec;
 	glm::vec3 emitted = rec.mat_ptr->Emitted(r, rec);
-	float pdf_val = 0.f;
-	if(!rec.mat_ptr->Scatter(r, rec, attenuation, scattered, pdf_val))
+	if(!rec.mat_ptr->Scatter(r, rec, srec))
 		return emitted;
-	
 	std::shared_ptr<Hittable> light_shape = std::make_shared<XZRect>(213.f, 343.f, 227.f, 332.f, 554.f, nullptr);
-	HittablePdf light_pdf(light_shape, rec.p);
 
-	CosinePdf cosine_pdf(rec.normal);
-	MixturePdf pdf(&light_pdf, &cosine_pdf);
-	
-	scattered = Ray(rec.p, pdf.Generate(), r.Time());
-	pdf_val = pdf.Value(scattered.Direction());
-	
-	return emitted + attenuation * rec.mat_ptr->ScatteringPdf(r, rec, scattered) * Color(scattered, world, depth + 1) / pdf_val;
+	auto light_pdf = std::make_shared<HittablePdf>(light_shape, rec.p);
+	MixturePdf pdf(light_pdf, srec.pdf);
 
+	Ray scattered = Ray(rec.p, pdf.Generate(), r.Time());
+	auto pdf_val = pdf.Value(scattered.Direction());
+	
+	return emitted + srec.attenuation * rec.mat_ptr->ScatteringPdf(r, rec, scattered) * Color(scattered, world,depth + 1) / pdf_val;
 }
 
 bool Renderer::WindowShouldClose() const
@@ -96,7 +90,7 @@ void Renderer::RenderFrames()
 
 	for (uint8_t i = 0; i < num_cores; i++)
 	{
-		futures[i] = std::async([=] {RenderSingleLine(y, img_data_, world_, camera_); });
+		futures[i] = std::async([=] {RenderSingleLine(y, img_data_, world_, lights_, camera_); });
 		++y;
 	}
 	while (y < ny_)
@@ -105,7 +99,7 @@ void Renderer::RenderFrames()
 		{
 			if (futures[i].wait_for(std::chrono::milliseconds(0)) == std::future_status::ready && y < ny_)
 			{
-				futures[i] = std::async([=] {RenderSingleLine(y, img_data_, world_, camera_); });
+				futures[i] = std::async([=] {RenderSingleLine(y, img_data_, world_, lights_, camera_); });
 				++y;
 			}
 		}
@@ -252,7 +246,7 @@ bool Renderer::InitOpenGL()
 	return true;
 }
 
-void Renderer::RenderSingleLine(unsigned int y, float* img_data, Hittable* world, Camera& camera)
+void Renderer::RenderSingleLine(unsigned int y, float* img_data, Hittable* world, std::shared_ptr<Hittable> lights, Camera& camera)
 {
 	std::atomic_uint n = (ny_ - 1 - y) * nx_ * 3u;
 	const auto v = (static_cast<float>(y) + utility::RandomFloat()) / static_cast<float>(ny_);

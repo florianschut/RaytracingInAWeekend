@@ -1,5 +1,6 @@
 #pragma once
 #include <atomic>
+#include <memory>
 
 #include <glm/glm.hpp>
 
@@ -39,7 +40,7 @@ public:
 
 private:
 	bool InitOpenGL();
-	static inline void RenderSingleLine(unsigned int y, float* img_data, Hittable* world, Camera& camera);
+	static inline void RenderSingleLine(unsigned int y, float* img_data, Hittable* world, std::shared_ptr<Hittable> lights, Camera& camera);
 	void InitImGui();
 	void TickImGui();
 
