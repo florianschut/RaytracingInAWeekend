@@ -5,7 +5,7 @@
 class Isotropic : public Material
 {
 public:
-	Isotropic(Texture* albedo): albedo_(albedo){}
+	Isotropic(std::shared_ptr<Texture> albedo): albedo_(albedo){}
 
 	bool Scatter(const Ray&, const HitRecord& rec, ScatterRecord& srec) const
 	{
@@ -15,5 +15,5 @@ public:
 	}
 	
 private:
-	Texture* albedo_;
+	std::shared_ptr<Texture> albedo_;
 };

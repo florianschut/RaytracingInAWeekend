@@ -111,24 +111,26 @@ namespace scene
 
 	std::shared_ptr<Hittable> CornelScene(Camera& camera, std::shared_ptr<Hittable>& lights, float aspect)
 	{
-		std::shared_ptr<HittableList> scene = std::make_shared<HittableList>();
-		Material* red = new Lambertian(new ConstantTexture(glm::vec3(0.65, 0.05, 0.05)));
-		Material* white = new Lambertian(new ConstantTexture(glm::vec3(0.73, 0.73, 0.73)));
-		Material* green = new Lambertian(new ConstantTexture(glm::vec3(0.12, 0.45, 0.15)));
-		Material* light = new DiffuseLight(new ConstantTexture(glm::vec3(15)));
+		auto scene = std::make_shared<HittableList>();
+		auto red = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.65f, 0.05f, 0.05f)));
+		auto white = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.73f, 0.73f, 0.73f)));
+		auto green = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.12f, 0.45f, 0.15f)));
+		auto light = std::make_shared<DiffuseLight>(std::make_shared<ConstantTexture>(glm::vec3(15)));
+		auto aluminum = std::make_shared<Metal>(std::make_shared<ConstantTexture>(glm::vec3(0.8f, 0.85f, 0.88f)), 0.0f);
 		
-		scene->Add(std::make_shared<FlipNormals>(new YZRect(0, 555, 0, 555, 555, green)));
+		scene->Add(std::make_shared<FlipNormals>(std::make_shared <YZRect>(0.f, 555.f, 0.f, 555.f, 555.f, green)));
 		scene->Add(std::make_shared<YZRect>(0.f, 555.f, 0.f, 555.f, 0.f, red));
 		//scene.Add(std::make_shared<XZRect>(113, 443, 127, 432, 554, light));
-		lights = std::make_shared<FlipNormals>(new XZRect(213, 343, 227, 332, 554, light));
+		lights = std::make_shared<FlipNormals>(std::make_shared<XZRect>(213.f, 343.f, 227.f, 332.f, 554.f, light));
 
 		scene->Add(lights);
 		
-		scene->Add(std::make_shared<FlipNormals>(new XZRect(0.f, 555.f, 0.f, 555.f, 555.f, white)));
+		scene->Add(std::make_shared<FlipNormals>(std::make_shared<XZRect>(0.f, 555.f, 0.f, 555.f, 555.f, white)));
 		scene->Add(std::make_shared<XZRect>(0.f, 555.f, 0.f, 555.f, 0.f, white));
-		scene->Add(std::make_shared<FlipNormals>(new XYRect(0, 555, 0, 555, 555, white)));
-		scene->Add(std::make_shared<Translate>(new RotateY(new Box(glm::vec3(0, 0, 0), glm::vec3(165, 165, 165), white), -18.f), glm::vec3(130, 0, 65)));// , 0.01f, new ConstantTexture(glm::vec3(1.f))));
-		scene->Add(std::make_shared<Translate>(new RotateY(new Box(glm::vec3(0, 0, 0), glm::vec3(165, 330, 165), white), 15.f), glm::vec3(265, 0, 295)));// , 0.01f, new ConstantTexture(glm::vec3(0.f)));
+		scene->Add(std::make_shared<FlipNormals>(std::make_shared <XYRect>(0.f, 555.f, 0.f, 555.f, 555.f, white)));
+		auto box1 = std::make_shared<Box>(glm::vec3(0, 0, 0), glm::vec3(165.f, 330.f, 165.f), aluminum);
+		scene->Add(std::make_shared<Translate>(std::make_shared<RotateY>(std::make_shared<Box>(glm::vec3(0, 0, 0), glm::vec3(165, 165, 165), white), -18.f), glm::vec3(130.f, 0.f, 65.f)));// , 0.01f, new ConstantTexture(glm::vec3(1.f))));
+		scene->Add(std::make_shared<Translate>(std::make_shared<RotateY>(box1, 15.f), glm::vec3(265.f, 0.f, 295.f)));// , 0.01f, new ConstantTexture(glm::vec3(0.f)));
 		camera = Camera(glm::vec3(278, 278, -800), glm::vec3(278, 278, 0), glm::vec3(0, 1, 0), 40.0, aspect, 0.0, 10.0, 0, 1);
 		return scene;
 //		return std::make_shared<BvhNode>(scene, 0.f, 0.f);

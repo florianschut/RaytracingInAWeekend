@@ -7,7 +7,7 @@
 class XYRect: public Hittable
 {
 public:
-	XYRect(float x0, float x1, float y0, float y1, float k, Material* mat):
+	XYRect(float x0, float x1, float y0, float y1, float k, std::shared_ptr<Material> mat):
 	x0_(x0), x1_(x1), y0_(y0), y1_(y1), k_(k), material_(mat){}
 	bool Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const override;
 	bool BoundingBox(const float, const float, AABB& box) const override
@@ -17,7 +17,7 @@ public:
 	};
 
 private:
-	Material* material_;
+	std::shared_ptr<Material> material_;
 	float x0_, x1_, y0_, y1_, k_;
 };
 
@@ -43,7 +43,7 @@ inline bool XYRect::Hit(const Ray& r, float t_min, float t_max, HitRecord& recor
 class XZRect: public Hittable
 {
 public:
-	XZRect(float x0, float x1, float z0, float z1, float k, Material* mat) :
+	XZRect(float x0, float x1, float z0, float z1, float k, std::shared_ptr<Material> mat) :
 		x0_(x0), x1_(x1), z0_(z0), z1_(z1), k_(k), material_(mat) {}
 	bool Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const override;
 	bool BoundingBox(const float, const float, AABB& box) const override
@@ -73,7 +73,7 @@ public:
 
 private:
 	float x0_, x1_, z0_, z1_, k_;
-	Material* material_;
+	std::shared_ptr<Material> material_;
 };
 
 inline bool XZRect::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
@@ -99,7 +99,7 @@ inline bool XZRect::Hit(const Ray& r, float t_min, float t_max, HitRecord& recor
 class YZRect: public Hittable
 {
 public:
-	YZRect(float y0, float y1, float z0, float z1, float k, Material* mat) :
+	YZRect(float y0, float y1, float z0, float z1, float k, std::shared_ptr<Material> mat) :
 		y0_(y0), y1_(y1), z0_(z0), z1_(z1), k_(k), material_(mat) {}
 	bool Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const override;
 	bool BoundingBox(const float, const float, AABB& box) const override
@@ -109,7 +109,7 @@ public:
 	};
 
 private:
-	Material* material_;
+	std::shared_ptr<Material> material_;
 	float y0_, y1_, z0_, z1_, k_;
 };
 
@@ -135,7 +135,7 @@ inline bool YZRect::Hit(const Ray& r, float t_min, float t_max, HitRecord& recor
 class FlipNormals : public Hittable
 {
 public:
-	FlipNormals(Hittable* p) : hittable_(p) {}
+	FlipNormals(std::shared_ptr<Hittable> p) : hittable_(p) {}
 
 	bool Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const override
 	{
@@ -161,5 +161,5 @@ public:
 	}
 
 private:
-	Hittable* hittable_;
+	std::shared_ptr<Hittable> hittable_;
 };

@@ -6,7 +6,7 @@
 class ConstantMedium: public Hittable
 {
 public:
-	ConstantMedium(Hittable* boundry, float density, Texture* albedo): boundry_(boundry), density_(density), phase_function_(new Isotropic(albedo)){};
+	ConstantMedium(Hittable* boundry, float density, std::shared_ptr<Texture> albedo): boundry_(boundry), density_(density), phase_function_(std::make_shared<Isotropic>(albedo)){};
 	bool Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const override;
 	bool BoundingBox(const float time0, const float time1, AABB& box) const override
 	{
@@ -16,7 +16,7 @@ public:
 private:
 	Hittable* boundry_;
 	float density_;
-	Material* phase_function_;
+	std::shared_ptr<Material> phase_function_;
 };
 
 inline bool ConstantMedium::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const

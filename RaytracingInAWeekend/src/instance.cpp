@@ -13,7 +13,7 @@ bool Translate::BoundingBox(const float time0, const float time1, AABB& box) con
 	return false;
 }
 
-RotateY::RotateY(Hittable* hittable, float angle): hittable_(hittable)
+RotateY::RotateY(std::shared_ptr<Hittable> hittable, float angle): hittable_(hittable)
 {
 	float radians = static_cast<float>(M_PI / 180.0)* angle;
 	sin_theta_ = sin(radians);

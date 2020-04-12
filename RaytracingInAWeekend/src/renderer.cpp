@@ -59,6 +59,9 @@ glm::vec3 Renderer::Color(const Ray& r, std::shared_ptr<Hittable> world, std::sh
 	glm::vec3 emitted = rec.mat_ptr->Emitted(r, rec);
 	if(!rec.mat_ptr->Scatter(r, rec, srec))
 		return emitted;
+	
+	if(srec.specular)
+		return srec.attenuation * Color(srec.specular_ray, world, lights, depth + 1);
 
 	auto light_pdf = std::make_shared<HittablePdf>(lights, rec.p);
 	MixturePdf pdf(light_pdf, srec.pdf);

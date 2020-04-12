@@ -10,8 +10,8 @@
 class Lambertian :public Material
 {
 public:
-	Lambertian(Texture* albedo) : albedo_(albedo) {}
-	~Lambertian() { delete albedo_; };
+	Lambertian(std::shared_ptr<Texture> albedo) : albedo_(albedo) {}
+	~Lambertian() = default;
 	
 	virtual bool Scatter(const Ray& , const HitRecord& rec, ScatterRecord& srec) const
 	{
@@ -27,5 +27,5 @@ public:
 		return cosine < 0.f ? 0 : cosine / static_cast<float>(M_PI);
 	}
 	
-	Texture* albedo_;
+	std::shared_ptr<Texture> albedo_;
 };
