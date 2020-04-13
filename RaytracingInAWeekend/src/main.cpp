@@ -1,4 +1,3 @@
-#include <chrono>
 #include <iostream>
 #include <thread>
 
@@ -6,7 +5,6 @@
 
 #include "renderer.hpp"
 #include "scenes.hpp"
-
 
 int main()
 {
@@ -17,7 +15,7 @@ int main()
 	renderer->SetWorld(scene::CornelScene(renderer->camera_, lights, 16.f/9.f));
 	renderer->SetLights(lights);
 	
-	const auto start_running = std::chrono::system_clock::now();
+	renderer->start_running_ = std::chrono::system_clock::now();
 	
 	std::thread rendering_thread([&renderer]
 	{
@@ -35,7 +33,7 @@ int main()
 	
 	rendering_thread.join();
 
-	std::chrono::duration<double> runtime = std::chrono::system_clock::now() - start_running;
+	std::chrono::duration<double> runtime = std::chrono::system_clock::now() - renderer->start_running_;
 	std::cout << renderer->GetSamples() <<" spp in " << runtime.count() << " seconds = "
 		<< renderer->GetSamples() / runtime.count() << " sps " << (runtime.count() / renderer->GetSamples()) * 1000.f << " ms.";
 	delete(renderer);

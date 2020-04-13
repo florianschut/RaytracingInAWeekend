@@ -1,14 +1,16 @@
 #pragma once
 #include <atomic>
+#include <chrono>
 #include <memory>
 
 #include <glm/glm.hpp>
 
 #include "hittable.hpp"
 #include "camera.hpp"
-#include "hittable_list.hpp"
+
 
 struct GLFWwindow;
+class UserInterface;
 
 class Renderer
 {
@@ -40,12 +42,14 @@ public:
 	{
 		return samples_;
 	}
+	
+	std::chrono::time_point<std::chrono::system_clock> start_running_;
+	std::chrono::time_point<std::chrono::system_clock> previous_render_;
+	std::chrono::time_point<std::chrono::system_clock> last_render_;
 
-private:
+	private:
 	bool InitOpenGL();
 	static inline void RenderSingleLine(unsigned int y, float* img_data, std::shared_ptr<Hittable> world, std::shared_ptr<Hittable> lights, Camera& camera);
-	void InitImGui();
-	void TickImGui();
 
 	std::atomic<bool> did_render_ = false;
 
@@ -58,6 +62,8 @@ private:
 
 	std::shared_ptr<Hittable> world_ = nullptr;
 	std::shared_ptr<Hittable> lights_ = nullptr;
+
+	std::shared_ptr<UserInterface> user_interface_;
 	
 	GLFWwindow* window_ = nullptr;
 	unsigned int vbo_ = 0;
@@ -65,8 +71,6 @@ private:
 	unsigned int render_texture_ = 0;
 	unsigned int shader_program_ = 0;
 	unsigned int samples_uniform_ = 0;
-
-	bool camera_menu_open_ = true;
 
 	const float vertices_[12] =
 	{

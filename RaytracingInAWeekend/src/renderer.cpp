@@ -9,23 +9,19 @@
 #include "glfw3.h"
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_img/stb_image_write.h"
-#include "../ThirdParty/ImGui/imgui.h"
-#include "../ThirdParty/ImGui/imgui_impl_opengl3.h"
-#include "../ThirdParty/ImGui/imgui_impl_glfw.h"
 
 #include "ray.hpp"
 #include "material.hpp"
 #include "random.hpp"
 #include "pdf.hpp"
-#include "rectangle.hpp"
 #include "textures.hpp"
-#include "diffuse_light.hpp"
+#include "user_interface.hpp"
 
 Renderer::Renderer()
 {
 	img_data_ = new float[nx_ * ny_ * 3];
 	InitOpenGL();
-	InitImGui();
+	user_interface_ = std::make_shared<UserInterface>(window_);
 }
 
 Renderer::~Renderer()
@@ -89,6 +85,7 @@ void Renderer::RenderFrames()
 			img_data_[i] = 0.f;
 		samples_ = 0;
 		camera_.did_change_ = false;
+		start_running_ = std::chrono::system_clock::now();
 	}
 
 	unsigned int y = 0;
@@ -132,30 +129,20 @@ void Renderer::Tick()
 	{
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, nx_, ny_, 0, GL_RGB, GL_FLOAT, img_data_);
 		did_render_ = false;
+		previous_render_ = last_render_;
+		last_render_ = std::chrono::system_clock::now();
 		glGenerateMipmap(GL_TEXTURE_2D);
 		glUniform1f(samples_uniform_, static_cast<float>(samples_)); 
 	}
 	glfwPollEvents();
-
-	TickImGui();
 
 	glUseProgram(shader_program_);
 	glBindVertexArray(vao_);
 	glBindTexture(GL_TEXTURE, render_texture_);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-
-	const auto io = ImGui::GetIO();
-	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		GLFWwindow* backup_current_context = glfwGetCurrentContext();
-		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
-		glfwMakeContextCurrent(backup_current_context);
-	}
-
+	user_interface_->Tick(*this);
+	
 	glfwSwapBuffers(window_);
 }
 
@@ -270,45 +257,4 @@ void Renderer::RenderSingleLine(unsigned int y, float* img_data, std::shared_ptr
 	}
 }
 
-void Renderer::InitImGui()
-{
-	IMGUI_CHECKVERSION();
-	ImGui::CreateContext();
-	ImGuiIO& io = ImGui::GetIO();
-	io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;           // Enable Docking
-	io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;         // Enable Multi-Viewport / Platform Windows
 
-	ImGui::StyleColorsDark();
-
-	// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
-	ImGuiStyle& style = ImGui::GetStyle();
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		style.WindowRounding = 0.0f;
-		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-	}
-
-	// Setup Platform/Renderer bindings
-	ImGui_ImplGlfw_InitForOpenGL(reinterpret_cast<GLFWwindow*>(window_), true);
-	ImGui_ImplOpenGL3_Init("#version 460");
-}
-
-void Renderer::TickImGui()
-{
-	ImGui_ImplOpenGL3_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
-
-	if (camera_menu_open_)
-	{
-		ImGui::Begin("Camera Settings", &camera_menu_open_);
-
-		glm::vec3 camPos = camera_.GetOrigin();
-
-		if (ImGui::DragFloat3("Position", &camPos.x))
-			camera_.SetOrigin(camPos);
-
-		ImGui::End();
-	}
-	ImGui::Render();
-}

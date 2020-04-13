@@ -78,6 +78,9 @@
     <ClCompile Include="src\instance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\user_interface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ThirdParty\ImGui\imconfig.h">
@@ -174,6 +177,9 @@
       <Filter>Header Files\Hittables</Filter>
     </ClInclude>
     <ClInclude Include="src\pdf.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\user_interface.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
