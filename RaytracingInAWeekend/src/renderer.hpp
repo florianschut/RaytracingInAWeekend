@@ -43,7 +43,7 @@ public:
 		return samples_;
 	}
 
-	void SaveToFile(const char* name);
+	void SaveOutputToFile(const char* name = "output.bmp");
 	
 	std::chrono::time_point<std::chrono::system_clock> start_running_;
 	std::chrono::time_point<std::chrono::system_clock> previous_render_;

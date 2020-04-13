@@ -14,5 +14,5 @@ public:
 
 private:
 	//Contains position settings of the camera
-	void CameraMenu(Renderer& renderer);
+	void InfoMenu(Renderer& renderer);
 };

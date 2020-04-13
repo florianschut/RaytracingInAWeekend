@@ -46,7 +46,7 @@ void UserInterface::Tick(Renderer& renderer)
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
 
-	CameraMenu(renderer);
+	InfoMenu(renderer);
 	
 	ImGui::Render();
 
@@ -62,7 +62,7 @@ void UserInterface::Tick(Renderer& renderer)
 	}
 }
 
-void UserInterface::CameraMenu(Renderer& renderer)
+void UserInterface::InfoMenu(Renderer& renderer)
 {
 	ImGui::Begin("Info!");
 	std::chrono::duration<float> runtime = std::chrono::system_clock::now() - renderer.start_running_;
@@ -78,7 +78,7 @@ void UserInterface::CameraMenu(Renderer& renderer)
 	ImGui::InputText("File name", name_buf, 128);
 	ImGui::SameLine();
 	if (ImGui::Button("Save to file"))
-		renderer.SaveToFile(name_buf);
+		renderer.SaveOutputToFile(name_buf);
 	ImGui::End();
 
 }
