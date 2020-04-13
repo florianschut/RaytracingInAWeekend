@@ -260,7 +260,10 @@ void Renderer::RenderSingleLine(unsigned int y, float* img_data, std::shared_ptr
 	for (int x = 0; x < nx_; x++)
 	{
 		const auto u = (static_cast<float>(x) + utility::RandomFloat()) / static_cast<float>(nx_);
-		const auto col = Color(camera.GetRay(u, v), world, lights, 0);
+		auto col = Color(camera.GetRay(u, v), world, lights, 0);
+		if (col.r != col.r) col.r = 0.0f;
+		if (col.g != col.g) col.g = 0.0f;
+		if (col.b != col.b) col.b = 0.0f;
 		img_data[n++] += col.r;
 		img_data[n++] += col.g;
 		img_data[n++] += col.b;

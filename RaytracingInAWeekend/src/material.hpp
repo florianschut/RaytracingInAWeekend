@@ -6,9 +6,9 @@
 struct ScatterRecord
 {
 	Ray specular_ray;
-	bool specular;
-	glm::vec3 attenuation;
-	std::shared_ptr<Pdf> pdf;
+	bool specular = false;
+	glm::vec3 attenuation = glm::vec3(0.f);
+	std::shared_ptr<Pdf> pdf = nullptr;
 };
 
 class Material

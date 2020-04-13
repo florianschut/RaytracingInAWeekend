@@ -78,4 +78,17 @@ namespace utility
 		} while (glm::dot(retval, retval) >= 1.0);
 		return retval;
 	}
+
+	inline glm::vec3 RandomToSphere(float radius, float distance_squared)
+	{
+		auto r1 = utility::RandomFloat();
+		auto r2 = utility::RandomFloat();
+		auto z = 1.f + r2 * (sqrt(1 - radius * radius / distance_squared) - 1.f);
+
+		auto phi = 2 * static_cast<float>(M_PI) * r1;
+		auto x = cos(phi) * sqrt(1 - z * z);
+		auto y = sin(phi) * sqrt(1 - z * z);
+
+		return glm::vec3(x, y, z);
+	}
 }

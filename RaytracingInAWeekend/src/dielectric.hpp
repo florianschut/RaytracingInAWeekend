@@ -30,46 +30,25 @@ public:
 
 	virtual bool Scatter(const Ray& r_in, const HitRecord& rec, ScatterRecord& srec) const
 	{
-		glm::vec3 outward_normal;
-		glm::vec3 reflected = reflect(r_in.Direction(),rec.normal);
-		float ni_over_nt;
+		srec.specular = true;
+		srec.pdf = nullptr;
 		srec.attenuation = glm::vec3(1.0f, 1.0f, 1.0f);
-		glm::vec3 refracted;
+		
+		float etai_over_etat = rec.front_face ? 1.0f / ref_index_ : ref_index_;
 
-		float reflect_prob;
-		float cosine;
-
-		if(dot(r_in.Direction(), rec.normal) > 0)
+		glm::vec3 unit_direction = normalize(r_in.Direction());
+		float cos_theta = std::min(dot(-unit_direction, rec.normal), 1.0f);
+		float sin_theta = sqrt(1.0f - cos_theta * cos_theta);
+		
+		if(etai_over_etat * sin_theta > 1.0f || utility::RandomFloat() < Schlick(cos_theta, etai_over_etat))
 		{
-			outward_normal = -rec.normal;
-			ni_over_nt = ref_index_;
-			cosine = ref_index_ * dot(r_in.Direction(), rec.normal) / r_in.Direction().length();
-		}
-		else
-		{
-			outward_normal = rec.normal;
-			ni_over_nt = 1.0f / ref_index_;
-			cosine = -dot(r_in.Direction(), rec.normal) / r_in.Direction().length();
-		}
-
-		if (Refract(r_in.Direction(), outward_normal, ni_over_nt, refracted))
-		{
-			reflect_prob = Schlick(cosine, ref_index_);
-		}
-		else 
-		{
-			reflect_prob = 1.0f;
-		}
-
-		if(utility::RandomFloat() < reflect_prob)
-		{
+			glm::vec3 reflected = reflect(unit_direction, rec.normal);
 			srec.specular_ray = Ray(rec.p, reflected, r_in.Time());
-		}
-		else
-		{
-			srec.specular_ray = Ray(rec.p, refracted, r_in.Time());
+			return true;
 		}
 
+		glm::vec3 refracted = refract(unit_direction, rec.normal, etai_over_etat);
+		srec.specular_ray = Ray(rec.p, refracted, r_in.Time());
 		return true;
 	}
 	

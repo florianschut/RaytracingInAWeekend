@@ -73,3 +73,4 @@ public:
 private:
 	std::shared_ptr<Pdf> p[2];
 };
+
