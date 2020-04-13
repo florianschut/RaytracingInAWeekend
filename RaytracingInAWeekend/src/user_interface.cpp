@@ -64,18 +64,21 @@ void UserInterface::Tick(Renderer& renderer)
 
 void UserInterface::CameraMenu(Renderer& renderer)
 {
-	if (camera_menu_open_)
-	{
-		ImGui::Begin("Camera Settings");
-		std::chrono::duration<float> runtime = std::chrono::system_clock::now() - renderer.start_running_;
-		std::chrono::duration<float> last_pass = renderer.last_render_ - renderer.previous_render_;
+	ImGui::Begin("Info!");
+	std::chrono::duration<float> runtime = std::chrono::system_clock::now() - renderer.start_running_;
+	std::chrono::duration<float> last_pass = renderer.last_render_ - renderer.previous_render_;
 
-		ImGui::Text("%i Samples per pixel rendered over %.1f seconds. \nLast pass took %.4f ms.", renderer.GetSamples(), runtime.count(), last_pass.count());
-		glm::vec3 camPos = renderer.camera_.GetOrigin();
+	ImGui::Text("%i Samples per pixel rendered over %.1f seconds. \nLast pass took %.4f ms.", renderer.GetSamples(), runtime.count(), last_pass.count());
+	glm::vec3 camPos = renderer.camera_.GetOrigin();
 
-		if (ImGui::DragFloat3("Position", &camPos.x))
-			renderer.camera_.SetOrigin(camPos);
+	if (ImGui::DragFloat3("Position", &camPos.x))
+		renderer.camera_.SetOrigin(camPos);
+	ImGui::Separator();
+	static char name_buf[128] = "output.bmp";
+	ImGui::InputText("File name", name_buf, 128);
+	ImGui::SameLine();
+	if (ImGui::Button("Save to file"))
+		renderer.SaveToFile(name_buf);
+	ImGui::End();
 
-		ImGui::End();
-	}
 }

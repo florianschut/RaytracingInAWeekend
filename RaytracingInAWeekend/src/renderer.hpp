@@ -42,6 +42,8 @@ public:
 	{
 		return samples_;
 	}
+
+	void SaveToFile(const char* name);
 	
 	std::chrono::time_point<std::chrono::system_clock> start_running_;
 	std::chrono::time_point<std::chrono::system_clock> previous_render_;
