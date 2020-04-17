@@ -68,10 +68,10 @@ void UserInterface::InfoMenu(Renderer& renderer)
 	std::chrono::duration<float> runtime = std::chrono::system_clock::now() - renderer.start_running_;
 	std::chrono::duration<float> last_pass = renderer.last_render_ - renderer.previous_render_;
 
-	ImGui::Text("%i Samples per pixel rendered over %.1f seconds. \nLast pass took %.4f ms.", renderer.GetSamples(), runtime.count(), last_pass.count());
+	ImGui::Text("%i Samples per pixel rendered over %.1f seconds. \nLast pass took %.1f ms.", renderer.GetSamples(), runtime.count(), last_pass.count() * 1000.f);
 	glm::vec3 camPos = renderer.camera_.GetOrigin();
 
-	if (ImGui::DragFloat3("Position", &camPos.x))
+	if (ImGui::DragFloat3("Position", &camPos.x,0.25f, -10000.f, 10000.f, "%.1f"))
 		renderer.camera_.SetOrigin(camPos);
 	ImGui::Separator();
 	static char name_buf[128] = "output.bmp";
