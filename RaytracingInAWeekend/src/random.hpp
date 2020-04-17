@@ -24,6 +24,11 @@ namespace utility
 		return min + (max - min) * RandomFloat();
 	}
 
+	inline int RandomInt(int min, int max)
+	{
+		return std::min(static_cast<int>(RandomFloat(static_cast<float>(min), static_cast<float>(max) + 1.f)), max);
+	}
+
 	inline glm::vec3 RandomVec(float min, float max)
 	{
 		return glm::vec3(RandomFloat(min, max), RandomFloat(min, max), RandomFloat(min, max));

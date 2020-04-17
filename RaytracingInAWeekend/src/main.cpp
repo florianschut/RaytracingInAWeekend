@@ -12,7 +12,7 @@ int main()
 
 	std::shared_ptr<Hittable> lights = nullptr;
 	
-	renderer->SetWorld(scene::CornelScene(renderer->camera_, lights, 16.f/9.f));
+	renderer->SetWorld(Scene::CornellBunny(renderer->camera_, lights, 16.f/9.f));
 	renderer->SetLights(lights);
 	
 	renderer->start_running_ = std::chrono::system_clock::now();

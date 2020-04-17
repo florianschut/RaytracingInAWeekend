@@ -31,6 +31,7 @@
     <ClCompile Include="src\bvh_node.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\hittable_list.cpp" />
+    <ClCompile Include="src\scenes.cpp" />
     <ClCompile Include="src\user_interface.cpp" />
     <ClCompile Include="src\instance.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -54,6 +55,8 @@
     <ClInclude Include="src\diffuse_light.hpp" />
     <ClInclude Include="src\hittable.hpp" />
     <ClInclude Include="src\hittable_list.hpp" />
+    <ClInclude Include="src\mesh.hpp" />
+    <ClInclude Include="src\triangle.hpp" />
     <ClInclude Include="src\user_interface.hpp" />
     <ClInclude Include="src\instance.hpp" />
     <ClInclude Include="src\isotropic.hpp" />
@@ -129,7 +132,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>$(SolutionDir)\ThirdParty\glfw\include;$(SolutionDir)\ThirdParty\glad\include;$(SolutionDir)\ThirdParty;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)\ThirdParty\glfw\include;$(SolutionDir)\ThirdParty\glad\include;$(SolutionDir)\ThirdParty;$(SolutionDir)\ThirdParty\assimp\include$(IncludePath)</IncludePath>
     <LibraryPath>$(SolutionDir)\ThirdParty\glfw\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -137,8 +140,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(SolutionDir)\ThirdParty\glfw\include;$(SolutionDir)\ThirdParty\glad\include;$(SolutionDir)\ThirdParty;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\ThirdParty\glfw\Release;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SolutionDir)\ThirdParty\glfw\include;$(SolutionDir)\ThirdParty\glad\include;$(SolutionDir)\ThirdParty;$(SolutionDir)\ThirdParty\assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)\ThirdParty\glfw\Release;$(SolutionDir)\ThirdParty\assimp\release;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -199,7 +202,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>glfw3.lib;assimp-vc142-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

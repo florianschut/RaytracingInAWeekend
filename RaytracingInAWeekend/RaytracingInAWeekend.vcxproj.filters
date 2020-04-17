@@ -81,6 +81,9 @@
     <ClCompile Include="src\user_interface.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\scenes.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ThirdParty\ImGui\imconfig.h">
@@ -181,6 +184,12 @@
     </ClInclude>
     <ClInclude Include="src\user_interface.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\triangle.hpp">
+      <Filter>Header Files\Hittables</Filter>
+    </ClInclude>
+    <ClInclude Include="src\mesh.hpp">
+      <Filter>Header Files\Hittables</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
