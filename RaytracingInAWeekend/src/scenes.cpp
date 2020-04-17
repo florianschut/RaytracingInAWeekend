@@ -3,6 +3,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_img/stb_image.h>
 
+#include "world.hpp"
 #include "box.hpp"
 #include "camera.hpp"
 #include "bvh_node.hpp"
@@ -17,7 +18,7 @@
 #include "camera.hpp"
 #include "instance.hpp"
 
-std::shared_ptr<Hittable> Scene::EmptyCornell(Camera& camera, std::shared_ptr<Hittable>& lights, float aspect, glm::vec3 dimensions, float light_intensity, float light_size, bool bvh, bool inverse_z)
+std::shared_ptr<HittableList> Scene::EmptyCornell(std::shared_ptr<Camera>* camera, std::shared_ptr<Hittable>* lights, float aspect, glm::vec3 dimensions, float light_intensity, float light_size, bool inverse_z)
 {
 	auto scene = std::make_shared<HittableList>();
 	auto red = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.65f, 0.05f, 0.05f)));
@@ -26,11 +27,13 @@ std::shared_ptr<Hittable> Scene::EmptyCornell(Camera& camera, std::shared_ptr<Hi
 	auto light = std::make_shared<DiffuseLight>(std::make_shared<ConstantTexture>(glm::vec3(light_intensity)));
 
 	//Lights
-	lights = std::make_shared<HittableList>();
-	auto square_light = std::make_shared<FlipNormals>(std::make_shared<XZRect>(-0.5f * light_size, 0.5f * light_size, -0.5f * light_size, 0.5f * light_size, 0.5f * dimensions.y - 0.001f, light));
-	reinterpret_cast<std::shared_ptr<HittableList>&>(lights)->Add(square_light);
-	scene->Add(square_light);
-
+	if (lights != nullptr)
+	{
+		auto square_light = std::make_shared<FlipNormals>(std::make_shared<XZRect>(-0.5f * light_size, 0.5f * light_size, -0.5f * light_size, 0.5f * light_size, 0.5f * dimensions.y - 0.001f, light));
+		reinterpret_cast<std::shared_ptr<HittableList>&>(*lights)->Add(square_light);
+		scene->Add(square_light);
+	}
+	
 	//Walls
 	scene->Add(std::make_shared<FlipNormals>(std::make_shared <YZRect>(-0.5f * dimensions.y, 0.5f * dimensions.y, -0.5f * dimensions.z, 0.5f * dimensions.z, 0.5f * dimensions.x, green))); //left wall
 	scene->Add(std::make_shared<YZRect>(-0.5f * dimensions.y, 0.5f * dimensions.y, -0.5f * dimensions.z, 0.5f * dimensions.z, -0.5f * dimensions.z, red));                                     //right wall
@@ -41,17 +44,16 @@ std::shared_ptr<Hittable> Scene::EmptyCornell(Camera& camera, std::shared_ptr<Hi
 	else
 		scene->Add(std::make_shared<FlipNormals>(std::make_shared <XYRect>(-0.5f * dimensions.x, 0.5f * dimensions.x, -0.5f * dimensions.y, 0.5f * dimensions.y, -0.5f * dimensions.z, white))); //back wall
 
-	camera = Camera(glm::vec3(0.f, 0.f, -dimensions.z * 2.f * ((static_cast<float>(inverse_z) + 1.f))*0.5), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
-
-	if (!bvh)
-		return scene;
-	return std::make_shared<BvhNode>(*scene, 0.f, 1.f);
+	if(camera!= nullptr)
+		*camera = std::make_shared<Camera>(glm::vec3(0.f, 0.f, -dimensions.z * 2.f * ((static_cast<float>(inverse_z) + 1.f))*0.5), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
+	
+	return scene;
 }
 
-std::shared_ptr<Hittable> Scene::CornellScene(Camera& camera, std::shared_ptr<Hittable>& lights, float aspect)
+std::shared_ptr<World> Scene::CornellScene(float aspect)
 {
-	auto scene = std::make_shared<HittableList>();
-	scene->Add(EmptyCornell(camera, lights, aspect, glm::vec3(555.f), 13.f, 130.f, true));
+	std::shared_ptr<Hittable> lights = std::make_shared<HittableList>();
+	auto scene = EmptyCornell(nullptr, &lights, aspect, glm::vec3(555.f), 13.f, 130.f);
 
 	auto white = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.73f, 0.73f, 0.73f)));
 	auto aluminum = std::make_shared<Metal>(std::make_shared<ConstantTexture>(glm::vec3(0.8f, 0.85f, 0.88f)), 0.0f);
@@ -64,59 +66,61 @@ std::shared_ptr<Hittable> Scene::CornellScene(Camera& camera, std::shared_ptr<Hi
 	auto box1 = std::make_shared<Box>(glm::vec3(0, 0, 0), glm::vec3(165.f, 330.f, 165.f), aluminum);
 	scene->Add(std::make_shared<Translate>(std::make_shared<RotateY>(box1, 15.f), glm::vec3(265.f, 0.f, 295.f)));// , 0.01f, new ConstantTexture(glm::vec3(0.f)));
 
-	camera = Camera(glm::vec3(0, 0, -400), glm::vec3(0, 0, 0), glm::vec3(0, 1, 0), 40.0, aspect, 0.0, 10.0, 0, 1);
+	auto camera = std::make_shared<Camera>(glm::vec3(0.f, 0.f, -400.f), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
 
-	return std::make_shared<BvhNode>(*scene, 0.f, 0.f);
+	return std::make_shared<World>(std::make_shared<BvhNode>(*scene, 0.f, 0.f), lights, camera);
 }
 
-std::shared_ptr<Hittable> Scene::CornellBunny(Camera& camera, std::shared_ptr<Hittable>& lights, float aspect)
+std::shared_ptr<World> Scene::CornellBunny(float aspect)
 {
-	auto scene = std::make_shared<HittableList>();
-	scene->Add(EmptyCornell(camera, lights, aspect, glm::vec3(2.5f), 9.f, 1.f, true, true));
+	std::shared_ptr<Hittable> lights = std::make_shared<HittableList>();
+	auto scene = EmptyCornell(nullptr, &lights, aspect, glm::vec3(2.5f), 7.f, 1.f, true);
 
 	auto white = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.73f, 0.73f, 0.73f)));
 
 	auto mesh = std::make_shared<Mesh>("Assets/Models/bunny.obj", white);
 	scene->Add(std::make_shared<Translate>(mesh, glm::vec3(0.25f, -1.25f, -0.5f)));
-	camera = Camera(glm::vec3(0, 0, 4.5f), glm::vec3(0, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
-	return std::make_shared<BvhNode>(*scene, 0.f, 1.f);
+	auto camera = std::make_shared<Camera>(glm::vec3(0, 0, 4.5f), glm::vec3(0, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
+
+	auto background = std::make_shared<SkyBackground>();
+	return std::make_shared<World>(std::make_shared<BvhNode>(*scene, 0.f, 1.f), lights, camera, background);
 }
 
-std::shared_ptr<Hittable> Scene::CornellDragon(Camera& camera, std::shared_ptr<Hittable>& lights, float aspect)
+std::shared_ptr<World> Scene::CornellDragon(float aspect)
 {
-	auto scene = std::make_shared<HittableList>();
-	scene->Add(EmptyCornell(camera, lights, aspect, glm::vec3(2.5f), 13.f, 1.f, true));
+	std::shared_ptr<Hittable> lights = std::make_shared<HittableList>();
+
+	auto scene = EmptyCornell(nullptr, &lights, aspect, glm::vec3(2.5f), 13.f, 1.f);
 
 	auto white = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.73f, 0.73f, 0.73f)));
 
 	auto mesh = std::make_shared<Mesh>("Assets/Models/dragon.obj", white);
 	scene->Add(std::make_shared<Translate>(mesh, glm::vec3(0.f, -1.f, 0.f)));
-	camera = Camera(glm::vec3(0, 0, -2.0f), glm::vec3(0, -1.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
-	return std::make_shared<BvhNode>(*scene, 0.f, 1.f);
+	auto camera = std::make_shared<Camera>(glm::vec3(0, 0, -2.0f), glm::vec3(0, -1.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
+	return std::make_shared<World>(std::make_shared<BvhNode>(*scene, 0.f, 1.f), lights, camera);
 }
 
 
-std::shared_ptr<Hittable> Scene::CornellTeapot(Camera& camera, std::shared_ptr<Hittable>& lights, float aspect)
+std::shared_ptr<World> Scene::CornellTeapot(float aspect)
 {
-	auto scene = std::make_shared<HittableList>();
+	std::shared_ptr<Hittable> lights = std::make_shared<HittableList>();
+	auto scene = EmptyCornell(nullptr, &lights, aspect, glm::vec3(255.f), 13.f, 90.f);
 	auto white = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.73f, 0.73f, 0.73f)));
-	scene->Add(EmptyCornell(camera, lights, aspect, glm::vec3(255.f), 13.f, 90.f, true));
-
+	
 	auto teapot_mesh = std::make_shared<Mesh>("Assets/Models/teapot.obj", white);
 	scene->Add(std::make_shared<Translate>(teapot_mesh, glm::vec3(127.5f, 0.f, 127.5f)));
 
-	camera = Camera(glm::vec3(0, 0, -80.f), glm::vec3(0.f, -72.f, 50.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
+	auto camera = std::make_shared<Camera>(glm::vec3(0, 0, -80.f), glm::vec3(0.f, -72.f, 50.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
 
-	return std::make_shared<BvhNode>(*scene, 0.f, 0.f);
+	return std::make_shared<World>(std::make_shared<BvhNode>(*scene, 0.f, 1.f), lights, camera);
 }
 
 
-std::shared_ptr<Hittable> Scene::TriangleBoxScene(Camera& camera, std::shared_ptr<Hittable>& lights, float aspect)
+std::shared_ptr<World> Scene::TriangleBoxScene(float aspect)
 {
-	auto scene = std::make_shared<HittableList>();
+	std::shared_ptr<Hittable> lights = std::make_shared<HittableList>();
+	auto scene = EmptyCornell(nullptr, &lights, aspect, glm::vec3(5.55f), 3.f, 3.3f);
 	auto white = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.73f, 0.73f, 0.73f)));
-
-	scene->Add(EmptyCornell(camera, lights, aspect, glm::vec3(5.55f), 3.f, 3.3f, true));
 
 	float vertices[] = {
 		 -0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
@@ -168,9 +172,9 @@ std::shared_ptr<Hittable> Scene::TriangleBoxScene(Camera& camera, std::shared_pt
 	auto box1 = std::make_shared<Box>(glm::vec3(0, 0, 0), glm::vec3(1.f, 1.f, 1.f), white);
 	scene->Add(std::make_shared<Translate>(/*std::make_shared<RotateY>(*/box_mesh/*, 15.f)*/, glm::vec3(2.85f, 0.5f, 2.95f)));
 
-	camera = Camera(glm::vec3(0, 0, -4.00f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
+	auto camera = std::make_shared<Camera>(glm::vec3(0, 0, -4.00f), glm::vec3(0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
 
-	return std::make_shared<BvhNode>(*scene, 0.f, 0.f);
+	return std::make_shared<World>(std::make_shared<BvhNode>(*scene, 0.f, 1.f), lights, camera);
 }
 
 

@@ -10,7 +10,7 @@ class Camera
 public:
 	Camera(glm::vec3 look_from, glm::vec3 look_at, glm::vec3 up_vec, float v_fov, float aspect_ratio, float aperture, float focus_distance, float time0, float time1);
 	
-	Ray GetRay(float x, float y)
+	Ray GetRay(float x, float y) const 
 	{
 		float time = time0_ + utility::RandomFloat() * (time1_ - time0_);
 		if (lens_radius_ == 0.0f)

@@ -16,6 +16,7 @@
 #include "pdf.hpp"
 #include "textures.hpp"
 #include "user_interface.hpp"
+#include "world.hpp"
 
 Renderer::Renderer()
 {
@@ -35,14 +36,14 @@ Renderer::~Renderer()
 #endif
 }
 
-glm::vec3 Renderer::Color(const Ray& r, std::shared_ptr<Hittable> world, std::shared_ptr<Hittable> lights, unsigned int depth)
+glm::vec3 Renderer::Color(const Ray& r, std::shared_ptr<World> world, unsigned int depth)
 {
 	if (depth >= max_depth_)
 		return glm::vec3(0);
 	
 	HitRecord rec;
 	if (!world->Hit(r, 0.001f, FLT_MAX, rec))
-		return glm::vec3(0.f);
+		return world->BackgroundColor(r);
 
 	ScatterRecord srec;
 	glm::vec3 emitted = rec.mat_ptr->Emitted(r, rec);
@@ -50,15 +51,14 @@ glm::vec3 Renderer::Color(const Ray& r, std::shared_ptr<Hittable> world, std::sh
 		return emitted;
 	
 	if(srec.specular)
-		return srec.attenuation * Color(srec.specular_ray, world, lights, depth + 1);
+		return srec.attenuation * Color(srec.specular_ray, world, depth + 1);
 
-	auto light_pdf = std::make_shared<HittablePdf>(lights, rec.p);
-	MixturePdf pdf(light_pdf, srec.pdf);
+	MixturePdf pdf(world->LightPdf(rec), srec.pdf);
 
 	Ray scattered = Ray(rec.p, pdf.Generate(), r.Time());
 	auto pdf_val = pdf.Value(scattered.Direction());
 	
-	return emitted + srec.attenuation * rec.mat_ptr->ScatteringPdf(r, rec, scattered) * Color(scattered, world, lights,depth + 1) / pdf_val;
+	return emitted + srec.attenuation * rec.mat_ptr->ScatteringPdf(r, rec, scattered) * Color(scattered, world,depth + 1) / pdf_val;
 }
 
 bool Renderer::WindowShouldClose() const
@@ -87,7 +87,7 @@ void Renderer::RenderFrames()
 
 	for (uint8_t i = 0; i < num_cores; i++)
 	{
-		futures[i] = std::async([=] {RenderSingleLine(y, img_data_, world_, lights_, camera_); });
+		futures[i] = std::async([=] {RenderSingleLine(y, img_data_, world_); });
 		++y;
 	}
 	while (y < ny_)
@@ -96,7 +96,7 @@ void Renderer::RenderFrames()
 		{
 			if (futures[i].wait_for(std::chrono::milliseconds(0)) == std::future_status::ready && y < ny_)
 			{
-				futures[i] = std::async([=] {RenderSingleLine(y, img_data_, world_, lights_, camera_); });
+				futures[i] = std::async([=] {RenderSingleLine(y, img_data_, world_); });
 				++y;
 			}
 		}
@@ -111,7 +111,7 @@ void Renderer::RenderFrames()
 	delete[] futures;
 }
 
-void Renderer::SetWorld(std::shared_ptr<Hittable> world)
+void Renderer::SetWorld(std::shared_ptr<World> world)
 {
 	world_ = world;
 }
@@ -245,14 +245,14 @@ bool Renderer::InitOpenGL()
 	return true;
 }
 
-void Renderer::RenderSingleLine(unsigned int y, float* img_data, std::shared_ptr<Hittable> world, std::shared_ptr<Hittable> lights, Camera& camera)
+void Renderer::RenderSingleLine(unsigned int y, float* img_data, std::shared_ptr<World> world)
 {
 	std::atomic_uint n = (ny_ - 1 - y) * nx_ * 3u;
 	const auto v = (static_cast<float>(y) + utility::RandomFloat()) / static_cast<float>(ny_);
 	for (int x = 0; x < nx_; x++)
 	{
 		const auto u = (static_cast<float>(x) + utility::RandomFloat()) / static_cast<float>(nx_);
-		auto col = Color(camera.GetRay(u, v), world, lights, 0);
+		auto col = Color(world->GetCamera()->GetRay(u, v), world, 0);
 		if (col.r != col.r) col.r = 0.0f;
 		if (col.g != col.g) col.g = 0.0f;
 		if (col.b != col.b) col.b = 0.0f;
