@@ -140,9 +140,6 @@
     <ClInclude Include="src\metal.hpp">
       <Filter>Header Files\Matterials</Filter>
     </ClInclude>
-    <ClInclude Include="src\perlin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="src\hittable.hpp">
       <Filter>Header Files\Hittables</Filter>
     </ClInclude>
@@ -190,6 +187,9 @@
     </ClInclude>
     <ClInclude Include="src\mesh.hpp">
       <Filter>Header Files\Hittables</Filter>
+    </ClInclude>
+    <ClInclude Include="src\perlin.hpp">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
