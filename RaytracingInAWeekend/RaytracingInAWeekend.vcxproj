@@ -32,12 +32,15 @@
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\hittable_list.cpp" />
     <ClCompile Include="src\scenes.cpp" />
+    <ClCompile Include="src\cube_map.cpp" />
+    <ClCompile Include="src\texture.cpp" />
     <ClCompile Include="src\user_interface.cpp" />
     <ClCompile Include="src\instance.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\moving_sphere.cpp" />
     <ClCompile Include="src\renderer.cpp" />
     <ClCompile Include="src\sphere.cpp" />
+    <ClCompile Include="src\world.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\ThirdParty\ImGui\imconfig.h" />
@@ -56,6 +59,7 @@
     <ClInclude Include="src\hittable.hpp" />
     <ClInclude Include="src\hittable_list.hpp" />
     <ClInclude Include="src\mesh.hpp" />
+    <ClInclude Include="src\cube_map.hpp" />
     <ClInclude Include="src\world.hpp" />
     <ClInclude Include="src\triangle.hpp" />
     <ClInclude Include="src\user_interface.hpp" />

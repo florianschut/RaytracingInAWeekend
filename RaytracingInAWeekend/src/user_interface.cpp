@@ -1,16 +1,16 @@
 #include "user_interface.hpp"
 
-
-
 #include <chrono>
 #include <glfw3.h>
+
 #include <ImGui/imgui.h>
 #include <ImGui/imgui_impl_glfw.h>
 #include <ImGui/imgui_impl_opengl3.h>
 #include <glm/vec3.hpp>
 
+#include "camera.hpp"
 #include "renderer.hpp"
-
+#include "world.hpp"
 
 
 UserInterface::UserInterface(GLFWwindow* window)
@@ -69,10 +69,15 @@ void UserInterface::InfoMenu(Renderer& renderer)
 	std::chrono::duration<float> last_pass = renderer.last_render_ - renderer.previous_render_;
 
 	ImGui::Text("%i Samples per pixel rendered over %.1f seconds. \nLast pass took %.1f ms.", renderer.GetSamples(), runtime.count(), last_pass.count() * 1000.f);
-	glm::vec3 camPos = renderer.camera_.GetOrigin();
-
+	glm::vec3 camPos = renderer.GetWorld()->GetCamera()->GetOrigin();
+	glm::vec3 camDir = renderer.GetWorld()->GetCamera()->GetEulerDirection();
+	
 	if (ImGui::DragFloat3("Position", &camPos.x,0.25f, -10000.f, 10000.f, "%.1f"))
-		renderer.camera_.SetOrigin(camPos);
+		renderer.GetWorld()->GetCamera()->SetOrigin(camPos);
+
+	if (ImGui::DragFloat3("Rotation", &camDir.x, 0.2f, 0.f, 0.f, "%.2f"))
+		renderer.GetWorld()->GetCamera()->SetEulerDirection(camDir);
+
 	ImGui::Separator();
 	static char name_buf[128] = "output.bmp";
 	ImGui::InputText("File name", name_buf, 128);

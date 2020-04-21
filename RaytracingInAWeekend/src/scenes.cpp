@@ -1,8 +1,5 @@
 #include "scenes.hpp"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_img/stb_image.h>
-
 #include "world.hpp"
 #include "box.hpp"
 #include "camera.hpp"
@@ -74,15 +71,17 @@ std::shared_ptr<World> Scene::CornellScene(float aspect)
 std::shared_ptr<World> Scene::CornellBunny(float aspect)
 {
 	std::shared_ptr<Hittable> lights = std::make_shared<HittableList>();
-	auto scene = EmptyCornell(nullptr, &lights, aspect, glm::vec3(2.5f), 7.f, 1.f, true);
+	auto scene = EmptyCornell(nullptr, &lights, aspect, glm::vec3(2.5f), 0.f, 1.f, true);
 
 	auto white = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.73f, 0.73f, 0.73f)));
 
-	auto mesh = std::make_shared<Mesh>("Assets/Models/bunny.obj", white);
+	auto mesh = std::make_shared<Mesh>("assets/models/bunny.obj", white);
 	scene->Add(std::make_shared<Translate>(mesh, glm::vec3(0.25f, -1.25f, -0.5f)));
+	scene->Add(std::make_shared<Sphere>(glm::vec3(-1.25f), 0.5f, std::make_shared<Metal>(std::make_shared<ConstantTexture>(glm::vec3(1.f)), 0.f)));
+
 	auto camera = std::make_shared<Camera>(glm::vec3(0, 0, 4.5f), glm::vec3(0, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
 
-	auto background = std::make_shared<SkyBackground>();
+	auto background = std::make_shared<CubeMapBackground>("assets/textures/cave_skybox/");
 	return std::make_shared<World>(std::make_shared<BvhNode>(*scene, 0.f, 1.f), lights, camera, background);
 }
 
@@ -94,7 +93,7 @@ std::shared_ptr<World> Scene::CornellDragon(float aspect)
 
 	auto white = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.73f, 0.73f, 0.73f)));
 
-	auto mesh = std::make_shared<Mesh>("Assets/Models/dragon.obj", white);
+	auto mesh = std::make_shared<Mesh>("assets/models/dragon.obj", white);
 	scene->Add(std::make_shared<Translate>(mesh, glm::vec3(0.f, -1.f, 0.f)));
 	auto camera = std::make_shared<Camera>(glm::vec3(0, 0, -2.0f), glm::vec3(0, -1.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
 	return std::make_shared<World>(std::make_shared<BvhNode>(*scene, 0.f, 1.f), lights, camera);
@@ -107,7 +106,7 @@ std::shared_ptr<World> Scene::CornellTeapot(float aspect)
 	auto scene = EmptyCornell(nullptr, &lights, aspect, glm::vec3(255.f), 13.f, 90.f);
 	auto white = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.73f, 0.73f, 0.73f)));
 	
-	auto teapot_mesh = std::make_shared<Mesh>("Assets/Models/teapot.obj", white);
+	auto teapot_mesh = std::make_shared<Mesh>("assets/models/teapot.obj", white);
 	scene->Add(std::make_shared<Translate>(teapot_mesh, glm::vec3(127.5f, 0.f, 127.5f)));
 
 	auto camera = std::make_shared<Camera>(glm::vec3(0, 0, -80.f), glm::vec3(0.f, -72.f, 50.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);

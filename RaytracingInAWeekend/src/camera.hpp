@@ -20,11 +20,18 @@ public:
 		return Ray(origin_ + offset, lower_left_corner_ + x * horizontal_ + y * vertical_ - origin_ - offset, time);
 	}
 
-	glm::vec3 GetOrigin() const
-	{
-		return origin_;
-	}
 	void SetOrigin(glm::vec3 new_origin);
+
+	glm::vec3 GetOrigin() const { return origin_; }
+
+	void SetEulerDirection(glm::vec3 yaw_pitch_roll);
+
+	void SetForward(glm::vec3 dir);
+
+	//Gets the direction of the camera in Yaw-Pitch-Roll components	
+	glm::vec3 GetEulerDirection() const { return euler_direction_; }
+
+	void LookAt(glm::vec3 tar);
 	
 	bool did_change_ = false;
 
@@ -38,7 +45,8 @@ private:
 	glm::vec3 u_;
 	glm::vec3 v_;
 
-	glm::vec3 look_at_;
+	glm::vec3 euler_direction_;
+
 	glm::vec3 up_;
 
 	float theta_;

@@ -10,6 +10,7 @@
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "stb_img/stb_image_write.h"
 
+#include "camera.hpp"
 #include "ray.hpp"
 #include "material.hpp"
 #include "random.hpp"
@@ -71,13 +72,13 @@ void Renderer::RenderFrames()
 	if (did_render_ == true) //Don't intervene with texture copy, could and should probably be handled more efficiently
 		return;
 	
-	if (camera_.did_change_)
+	if (world_->GetCamera()->did_change_)
 	{
 		int array_size = nx_ * ny_ * 3;
 		for (int i = 0; i < array_size; i++)
 			img_data_[i] = 0.f;
 		samples_ = 0;
-		camera_.did_change_ = false;
+		world_->GetCamera()->did_change_ = false;
 		start_running_ = std::chrono::system_clock::now();
 	}
 

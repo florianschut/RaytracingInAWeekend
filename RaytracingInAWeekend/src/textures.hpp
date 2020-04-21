@@ -1,6 +1,9 @@
 #pragma once
+#include <iostream>
+
 #include <glm/vec3.hpp>
 #include <glm/vec2.hpp>
+
 #include "perlin.hpp"
 
 class Texture
@@ -8,9 +11,9 @@ class Texture
 public:
 	virtual ~Texture() {};
 	virtual glm::vec3 Value(float u, float v, const glm::vec3& p) const = 0;
-	glm::vec3 Value(const glm::vec2 uv, const glm::vec3& p) const { return Value(uv.x, uv.y, p); };
+	virtual glm::vec3 Value(const glm::vec2 uv, const glm::vec3& p) const { return Value(uv.x, uv.y, p); }
 };
-
+#
 class ConstantTexture: public Texture
 {
 public:
@@ -44,13 +47,15 @@ private:
 class ImageTexture: public Texture
 {
 public:
-	ImageTexture(unsigned char* img_data, const int width, const int height) :img_data_(img_data), width_(width), height_(height) {}
+	ImageTexture(const char* path);
+	ImageTexture(unsigned char* img_data, const int width, const int height);
 	~ImageTexture();
-	glm::vec3 Value(float u, float v, const glm::vec3& p) const override;
+	inline glm::vec3 Value(float u, float v, const glm::vec3& p) const override;
+	inline glm::vec3 Value(const glm::vec2 uv, const glm::vec3& p) const override { return Value(uv.x, uv.y, p); }
 
 private:
 	unsigned char* img_data_;
-	const int width_, height_;
+	int width_, height_, comp_;
 };
 
 inline glm::vec3 ImageTexture::Value(const float u, const float v, const glm::vec3&) const
@@ -62,15 +67,10 @@ inline glm::vec3 ImageTexture::Value(const float u, const float v, const glm::ve
 	if (j < 0) j = 0;
 	if (i > width_ - 1) i = width_ - 1;
 	if (j > height_ - 1) j = height_ - 1;
-	float r = static_cast<float>(static_cast<int>(img_data_[3 * i + 3 * width_ * j])) / 255.f;
-	float g = static_cast<float>(static_cast<int>(img_data_[3 * i + 3 * width_ * j + 1])) / 255.f;
-	float b = static_cast<float>(static_cast<int>(img_data_[3 * i + 3 * width_ * j + 2])) / 255.f;
+	float r = static_cast<float>(static_cast<int>(img_data_[comp_ * i + comp_ * width_ * j])) / 255.f;
+	float g = static_cast<float>(static_cast<int>(img_data_[comp_ * i + comp_ * width_ * j + 1])) / 255.f;
+	float b = static_cast<float>(static_cast<int>(img_data_[comp_ * i + comp_ * width_ * j + 2])) / 255.f;
 	return glm::vec3(r, g, b);
-}
-
-inline ImageTexture::~ImageTexture()
-{
-	delete[] img_data_;
 }
 
 class NoiseTexture: public Texture
