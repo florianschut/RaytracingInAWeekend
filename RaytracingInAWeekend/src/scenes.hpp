@@ -12,6 +12,7 @@ class Scene
 {
 public:
 	static std::shared_ptr<World> CornellScene(float aspect);
+	static std::shared_ptr<World> SkyboxScene(float aspect);
 	static std::shared_ptr<World> CornellBunny(float aspect);
 	static std::shared_ptr<World> CornellDragon(float aspect);
 	static std::shared_ptr<World> CornellTeapot(float aspect);

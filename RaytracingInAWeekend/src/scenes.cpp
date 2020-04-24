@@ -15,38 +15,6 @@
 #include "camera.hpp"
 #include "instance.hpp"
 
-std::shared_ptr<HittableList> Scene::EmptyCornell(std::shared_ptr<Camera>* camera, std::shared_ptr<Hittable>* lights, float aspect, glm::vec3 dimensions, float light_intensity, float light_size, bool inverse_z)
-{
-	auto scene = std::make_shared<HittableList>();
-	auto red = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.65f, 0.05f, 0.05f)));
-	auto white = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.73f, 0.73f, 0.73f)));
-	auto green = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.12f, 0.45f, 0.15f)));
-	auto light = std::make_shared<DiffuseLight>(std::make_shared<ConstantTexture>(glm::vec3(light_intensity)));
-
-	//Lights
-	if (lights != nullptr)
-	{
-		auto square_light = std::make_shared<FlipNormals>(std::make_shared<XZRect>(-0.5f * light_size, 0.5f * light_size, -0.5f * light_size, 0.5f * light_size, 0.5f * dimensions.y - 0.001f, light));
-		reinterpret_cast<std::shared_ptr<HittableList>&>(*lights)->Add(square_light);
-		scene->Add(square_light);
-	}
-	
-	//Walls
-	scene->Add(std::make_shared<FlipNormals>(std::make_shared <YZRect>(-0.5f * dimensions.y, 0.5f * dimensions.y, -0.5f * dimensions.z, 0.5f * dimensions.z, 0.5f * dimensions.x, green))); //left wall
-	scene->Add(std::make_shared<YZRect>(-0.5f * dimensions.y, 0.5f * dimensions.y, -0.5f * dimensions.z, 0.5f * dimensions.z, -0.5f * dimensions.z, red));                                     //right wall
-	scene->Add(std::make_shared<FlipNormals>(std::make_shared<XZRect>(-0.5f * dimensions.x, 0.5f * dimensions.x, -0.5f * dimensions.z, 0.5f * dimensions.z, 0.5f * dimensions.y, white)));  //top wall
-	scene->Add(std::make_shared<XZRect>(-0.5f * dimensions.x, 0.5f * dimensions.x, -0.5f * dimensions.z, 0.5f * dimensions.z, -0.5f * dimensions.y, white));                                   //bottom wall
-	if (!inverse_z)
-		scene->Add(std::make_shared<FlipNormals>(std::make_shared <XYRect>(-0.5f * dimensions.x, 0.5f * dimensions.x, -0.5f * dimensions.y, 0.5f * dimensions.y, 0.5f * dimensions.z, white))); //back wall
-	else
-		scene->Add(std::make_shared<FlipNormals>(std::make_shared <XYRect>(-0.5f * dimensions.x, 0.5f * dimensions.x, -0.5f * dimensions.y, 0.5f * dimensions.y, -0.5f * dimensions.z, white))); //back wall
-
-	if(camera!= nullptr)
-		*camera = std::make_shared<Camera>(glm::vec3(0.f, 0.f, -dimensions.z * 2.f * ((static_cast<float>(inverse_z) + 1.f))*0.5), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
-	
-	return scene;
-}
-
 std::shared_ptr<World> Scene::CornellScene(float aspect)
 {
 	std::shared_ptr<Hittable> lights = std::make_shared<HittableList>();
@@ -68,20 +36,46 @@ std::shared_ptr<World> Scene::CornellScene(float aspect)
 	return std::make_shared<World>(std::make_shared<BvhNode>(*scene, 0.f, 0.f), lights, camera);
 }
 
+std::shared_ptr<World> Scene::SkyboxScene(float aspect)
+{
+	std::shared_ptr<HittableList> scene = std::make_shared<HittableList>();
+
+	auto white = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.73f, 0.73f, 0.73f)));
+	auto glass = std::make_shared<Dielectric>(1.5f);
+	auto mirror = std::make_shared<Metal>(std::make_shared<ConstantTexture>(glm::vec3(1.f)), 0.0f);
+	auto fuzzy_metal = std::make_shared<Metal>(std::make_shared<ConstantTexture>(glm::vec3(1.f)), 0.85f);
+	auto light = std::make_shared<DiffuseLight>(std::make_shared<ConstantTexture>(glm::vec3(7.f)));
+
+	auto square_light = std::make_shared<FlipNormals>(std::make_shared<XZRect>(-0.5f , 0.5f, -0.5f , 0.5f , 2.5f - 0.001f, light));
+	scene->Add(square_light);
+
+	scene->Add(std::make_shared<Mesh>("assets/models/bunny.obj", white));
+	scene->Add(std::make_shared<Sphere>(glm::vec3(-3.f, 0.f, 0.f), 0.5f, mirror));
+	scene->Add(std::make_shared<Sphere>(glm::vec3(3.f, 2.f, 0.f), 0.5f, white));
+	scene->Add(std::make_shared<Sphere>(glm::vec3(3.f, 0.f, 0.f), 0.5f, fuzzy_metal));
+	scene->Add(std::make_shared<Sphere>(glm::vec3(-3.f, 2.f, 0.f), 0.5f, glass));
+
+	auto camera = std::make_shared<Camera>(glm::vec3(0, 1.25, 8.f), glm::vec3(0, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
+
+	auto background = std::make_shared<EquirectBackground>("assets/textures/Luxo-Jr_8000x4000_irradiance.hdr", 90.f);
+
+	return std::make_shared<World>(std::make_shared<BvhNode>(*scene, 0.f, 1.f), square_light, camera, background);
+}
+
 std::shared_ptr<World> Scene::CornellBunny(float aspect)
 {
 	std::shared_ptr<Hittable> lights = std::make_shared<HittableList>();
-	auto scene = EmptyCornell(nullptr, &lights, aspect, glm::vec3(2.5f), 0.f, 1.f, true);
+	auto scene = EmptyCornell(nullptr, &lights, aspect, glm::vec3(2.5f), 7.f, 1.f, true);
 
 	auto white = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.73f, 0.73f, 0.73f)));
 
 	auto mesh = std::make_shared<Mesh>("assets/models/bunny.obj", white);
 	scene->Add(std::make_shared<Translate>(mesh, glm::vec3(0.25f, -1.25f, -0.5f)));
-	scene->Add(std::make_shared<Sphere>(glm::vec3(-1.25f), 0.5f, std::make_shared<Metal>(std::make_shared<ConstantTexture>(glm::vec3(1.f)), 0.f)));
 
 	auto camera = std::make_shared<Camera>(glm::vec3(0, 0, 4.5f), glm::vec3(0, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
 
-	auto background = std::make_shared<CubeMapBackground>("assets/textures/cave_skybox/");
+	auto background = std::make_shared<SkyBackground>();
+
 	return std::make_shared<World>(std::make_shared<BvhNode>(*scene, 0.f, 1.f), lights, camera, background);
 }
 
@@ -176,7 +170,37 @@ std::shared_ptr<World> Scene::TriangleBoxScene(float aspect)
 	return std::make_shared<World>(std::make_shared<BvhNode>(*scene, 0.f, 1.f), lights, camera);
 }
 
+std::shared_ptr<HittableList> Scene::EmptyCornell(std::shared_ptr<Camera>* camera, std::shared_ptr<Hittable>* lights, float aspect, glm::vec3 dimensions, float light_intensity, float light_size, bool inverse_z)
+{
+	auto scene = std::make_shared<HittableList>();
+	auto red = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.65f, 0.05f, 0.05f)));
+	auto white = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.73f, 0.73f, 0.73f)));
+	auto green = std::make_shared<Lambertian>(std::make_shared<ConstantTexture>(glm::vec3(0.12f, 0.45f, 0.15f)));
+	auto light = std::make_shared<DiffuseLight>(std::make_shared<ConstantTexture>(glm::vec3(light_intensity)));
 
+	//Lights
+	if (lights != nullptr)
+	{
+		auto square_light = std::make_shared<FlipNormals>(std::make_shared<XZRect>(-0.5f * light_size, 0.5f * light_size, -0.5f * light_size, 0.5f * light_size, 0.5f * dimensions.y - 0.001f, light));
+		reinterpret_cast<std::shared_ptr<HittableList>&>(*lights)->Add(square_light);
+		scene->Add(square_light);
+	}
+
+	//Walls
+	scene->Add(std::make_shared<FlipNormals>(std::make_shared <YZRect>(-0.5f * dimensions.y, 0.5f * dimensions.y, -0.5f * dimensions.z, 0.5f * dimensions.z, 0.5f * dimensions.x, green))); //left wall
+	scene->Add(std::make_shared<YZRect>(-0.5f * dimensions.y, 0.5f * dimensions.y, -0.5f * dimensions.z, 0.5f * dimensions.z, -0.5f * dimensions.z, red));                                     //right wall
+	scene->Add(std::make_shared<FlipNormals>(std::make_shared<XZRect>(-0.5f * dimensions.x, 0.5f * dimensions.x, -0.5f * dimensions.z, 0.5f * dimensions.z, 0.5f * dimensions.y, white)));  //top wall
+	scene->Add(std::make_shared<XZRect>(-0.5f * dimensions.x, 0.5f * dimensions.x, -0.5f * dimensions.z, 0.5f * dimensions.z, -0.5f * dimensions.y, white));                                   //bottom wall
+	if (!inverse_z)
+		scene->Add(std::make_shared<FlipNormals>(std::make_shared <XYRect>(-0.5f * dimensions.x, 0.5f * dimensions.x, -0.5f * dimensions.y, 0.5f * dimensions.y, 0.5f * dimensions.z, white))); //back wall
+	else
+		scene->Add(std::make_shared<FlipNormals>(std::make_shared <XYRect>(-0.5f * dimensions.x, 0.5f * dimensions.x, -0.5f * dimensions.y, 0.5f * dimensions.y, -0.5f * dimensions.z, white))); //back wall
+
+	if (camera != nullptr)
+		*camera = std::make_shared<Camera>(glm::vec3(0.f, 0.f, -dimensions.z * 2.f * ((static_cast<float>(inverse_z) + 1.f)) * 0.5), glm::vec3(0.f, 0.f, 0.f), glm::vec3(0.f, 1.f, 0.f), 40.0f, aspect, 0.0f, 10.0f, 0.f, 1.f);
+
+	return scene;
+}
 
 
 /* needs to be switched to std::shared_ptr*/

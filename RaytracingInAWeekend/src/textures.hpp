@@ -10,10 +10,10 @@ class Texture
 {
 public:
 	virtual ~Texture() {};
-	virtual glm::vec3 Value(float u, float v, const glm::vec3& p) const = 0;
-	virtual glm::vec3 Value(const glm::vec2 uv, const glm::vec3& p) const { return Value(uv.x, uv.y, p); }
+	[[nodiscard]] virtual glm::vec3 Value(float u, float v, const glm::vec3& p) const = 0;
+	[[nodiscard]] virtual glm::vec3 Value(const glm::vec2 uv, const glm::vec3& p) const { return Value(uv.x, uv.y, p); }
 };
-#
+
 class ConstantTexture: public Texture
 {
 public:

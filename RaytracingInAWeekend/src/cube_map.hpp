@@ -7,7 +7,7 @@ public:
 	CubeMap(const char* dir_name);
 	~CubeMap();
 
-	glm::vec3 Value(glm::vec3 dir) const 
+	[[nodiscard]] glm::vec3 Value(glm::vec3 dir) const 
 	{
 		//Based on L. Spiro's code shared at https://www.gamedev.net/forums/topic/687535-implementing-a-cube-map-lookup-function/
 		glm::vec3 dir_abs = abs(dir);

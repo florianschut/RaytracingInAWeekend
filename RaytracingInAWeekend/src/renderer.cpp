@@ -31,10 +31,6 @@ Renderer::~Renderer()
 	glfwTerminate();
 	SaveOutputToFile();
 	delete[] img_data_;
-#ifdef  _DEBUG
-	if(!world_.unique())
-		std::cerr << "Renderer::world_ is still being referenced!\n";
-#endif
 }
 
 glm::vec3 Renderer::Color(const Ray& r, std::shared_ptr<World> world, unsigned int depth)
@@ -54,10 +50,13 @@ glm::vec3 Renderer::Color(const Ray& r, std::shared_ptr<World> world, unsigned i
 	if(srec.specular)
 		return srec.attenuation * Color(srec.specular_ray, world, depth + 1);
 
-	MixturePdf pdf(world->LightPdf(rec), srec.pdf);
+	auto pdf = srec.pdf;
+	
+	if (world->LightPdf(rec) != nullptr)
+		pdf = std::make_shared<MixturePdf>(world->LightPdf(rec), srec.pdf);
 
-	Ray scattered = Ray(rec.p, pdf.Generate(), r.Time());
-	auto pdf_val = pdf.Value(scattered.Direction());
+	auto scattered = Ray(rec.p, pdf->Generate(), r.Time());
+	auto pdf_val = pdf->Value(scattered.Direction());
 	
 	return emitted + srec.attenuation * rec.mat_ptr->ScatteringPdf(r, rec, scattered) * Color(scattered, world,depth + 1) / pdf_val;
 }
@@ -169,7 +168,7 @@ bool Renderer::InitOpenGL()
 	}
 	glfwMakeContextCurrent(window_);
 
-	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
+	if (!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
 	{
 		std::cout << "Failed to initialize GLAD\n";
 
@@ -240,7 +239,7 @@ bool Renderer::InitOpenGL()
 	glBindVertexArray(vao_);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices_), vertices_, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), static_cast<void*>(0));
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), nullptr);
 	glEnableVertexAttribArray(0);
 
 	return true;

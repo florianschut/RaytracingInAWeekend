@@ -64,14 +64,15 @@ void UserInterface::Tick(Renderer& renderer)
 
 void UserInterface::InfoMenu(Renderer& renderer)
 {
-	ImGui::Begin("Info!");
+	ImGui::Begin("Info");
 	std::chrono::duration<float> runtime = std::chrono::system_clock::now() - renderer.start_running_;
 	std::chrono::duration<float> last_pass = renderer.last_render_ - renderer.previous_render_;
 
 	ImGui::Text("%i Samples per pixel rendered over %.1f seconds. \nLast pass took %.1f ms.", renderer.GetSamples(), runtime.count(), last_pass.count() * 1000.f);
 	glm::vec3 camPos = renderer.GetWorld()->GetCamera()->GetOrigin();
 	glm::vec3 camDir = renderer.GetWorld()->GetCamera()->GetEulerDirection();
-	
+	ImGui::Separator();
+	ImGui::Text("Camera Settings");
 	if (ImGui::DragFloat3("Position", &camPos.x,0.25f, -10000.f, 10000.f, "%.1f"))
 		renderer.GetWorld()->GetCamera()->SetOrigin(camPos);
 
@@ -79,6 +80,7 @@ void UserInterface::InfoMenu(Renderer& renderer)
 		renderer.GetWorld()->GetCamera()->SetEulerDirection(camDir);
 
 	ImGui::Separator();
+	ImGui::Text("Save");
 	static char name_buf[128] = "output.bmp";
 	ImGui::InputText("File name", name_buf, 128);
 	ImGui::SameLine();
