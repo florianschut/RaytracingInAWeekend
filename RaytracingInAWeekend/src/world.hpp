@@ -29,7 +29,8 @@ public:
 
 	std::shared_ptr<Camera> GetCamera() { return camera_; }
 	glm::vec3 BackgroundColor(const Ray& r) const  { return background_->Value(r); }
-	
+
+	const std::shared_ptr<Hittable>& GetHittable() { return hittable_; }
 private:
 	std::shared_ptr<Hittable> hittable_;
 	std::shared_ptr<Hittable> lights_;

@@ -7,6 +7,8 @@
 #include <ImGui/imgui_impl_glfw.h>
 #include <ImGui/imgui_impl_opengl3.h>
 #include <glm/vec3.hpp>
+#include <string>
+
 
 #include "camera.hpp"
 #include "renderer.hpp"
@@ -47,6 +49,7 @@ void UserInterface::Tick(Renderer& renderer)
 	ImGui::NewFrame();
 
 	InfoMenu(renderer);
+	SceneEditor(renderer);
 	
 	ImGui::Render();
 
@@ -88,4 +91,24 @@ void UserInterface::InfoMenu(Renderer& renderer)
 		renderer.SaveOutputToFile(name_buf);
 	ImGui::End();
 
+}
+
+void UserInterface::SceneEditor(Renderer& renderer)
+{
+	
+	ImGui::Begin("Scene Editor");
+	const int item_count = 33;
+	ImVec2 size = ImGui::GetContentRegionAvail();
+	size.y -= ImGui::GetItemsLineHeightWithSpacing();
+
+	//TODO: Manually track names in hittables
+	auto world = typeid(*renderer.GetWorld()->GetHittable()).name();
+	ImGui::CollapsingHeader(world);
+
+	for (auto items = 0; items < item_count; items++)
+	{
+		ImGui::CollapsingHeader(("Item nr: " + std::to_string(items)).c_str());
+	}
+	
+	ImGui::End();
 }

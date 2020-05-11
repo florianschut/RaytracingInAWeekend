@@ -1,5 +1,6 @@
 #pragma once
 
+class World;
 class Renderer;
 struct GLFWwindow;
 
@@ -15,4 +16,6 @@ public:
 private:
 	//Contains position settings of the camera
 	void InfoMenu(Renderer& renderer);
+
+	void SceneEditor(Renderer& renderer);
 };
