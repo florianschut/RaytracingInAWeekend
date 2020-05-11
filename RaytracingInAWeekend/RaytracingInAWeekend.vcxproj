@@ -33,7 +33,7 @@
     <ClCompile Include="src\hittable_list.cpp" />
     <ClCompile Include="src\scenes.cpp" />
     <ClCompile Include="src\cube_map.cpp" />
-    <ClCompile Include="src\texture.cpp" />
+    <ClCompile Include="src\textures.cpp" />
     <ClCompile Include="src\user_interface.cpp" />
     <ClCompile Include="src\instance.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -52,6 +52,7 @@
     <ClInclude Include="..\ThirdParty\ImGui\imstb_truetype.h" />
     <ClInclude Include="src\aabb.hpp" />
     <ClInclude Include="src\box.hpp" />
+    <ClInclude Include="src\brdf.hpp" />
     <ClInclude Include="src\bvh_node.hpp" />
     <ClInclude Include="src\camera.hpp" />
     <ClInclude Include="src\dielectric.hpp" />
@@ -201,6 +202,7 @@
       <ConformanceMode>true</ConformanceMode>
       <TreatWarningAsError>true</TreatWarningAsError>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

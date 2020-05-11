@@ -88,8 +88,7 @@ public:
 	inline glm::vec3 Value(const Ray& r) const override;
 
 private:
-	float* img_data_ = nullptr;
-	int width_, height_, comp_;
+	std::shared_ptr<ImageTexture> texture_;
 	float rotation_deg_ = 0.f;
 	glm::mat2 rotation_;
 };
@@ -110,15 +109,6 @@ inline glm::vec3 EquirectBackground::Value(const Ray& ray) const
 	glm::vec2 longlat = glm::vec2(atan2(dir.z, dir.x), acos(-dir.y));
 	glm::vec2 uv = longlat / glm::vec2(2.f * static_cast<float>(M_PI), static_cast<float>(M_PI));
 	uv.x += 0.5f;
-	int i = static_cast<int>(uv.x * width_);
-	int j = static_cast<int>((1.f - uv.y) * height_ - 0.001f);
 
-	if (i < 0) i = 0;
-	if (j < 0) j = 0;
-	if (i > width_ - 1) i = width_ - 1;
-	if (j > height_ - 1) j = height_ - 1;
-	float r = img_data_[comp_ * i + comp_ * width_ * j];
-	float g = img_data_[comp_ * i + comp_ * width_ * j + 1];
-	float b = img_data_[comp_ * i + comp_ * width_ * j + 2];
-	return glm::vec3(r, g, b);
+	return texture_->Value(uv.x, uv.y);
 }

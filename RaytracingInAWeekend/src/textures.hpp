@@ -10,8 +10,8 @@ class Texture
 {
 public:
 	virtual ~Texture() {};
-	[[nodiscard]] virtual glm::vec3 Value(float u, float v, const glm::vec3& p) const = 0;
-	[[nodiscard]] virtual glm::vec3 Value(const glm::vec2 uv, const glm::vec3& p) const { return Value(uv.x, uv.y, p); }
+	[[nodiscard]] virtual glm::vec3 Value(float u, float v, const glm::vec3& p = glm::vec3()) const = 0;
+	[[nodiscard]] virtual glm::vec3 Value(const glm::vec2 uv, const glm::vec3& p = glm::vec3()) const { return Value(uv.x, uv.y, p); }
 };
 
 class ConstantTexture: public Texture
@@ -48,13 +48,13 @@ class ImageTexture: public Texture
 {
 public:
 	ImageTexture(const char* path);
-	ImageTexture(unsigned char* img_data, const int width, const int height);
+	ImageTexture(float* img_data, const int width, const int height);
 	~ImageTexture();
-	inline glm::vec3 Value(float u, float v, const glm::vec3& p) const override;
-	inline glm::vec3 Value(const glm::vec2 uv, const glm::vec3& p) const override { return Value(uv.x, uv.y, p); }
+	inline glm::vec3 Value(float u, float v, const glm::vec3& p = glm::vec3()) const override;
+	inline glm::vec3 Value(const glm::vec2 uv, const glm::vec3& p = glm::vec3()) const override { return Value(uv.x, uv.y, p); }
 
 private:
-	unsigned char* img_data_;
+	float* img_data_;
 	int width_, height_, comp_;
 };
 
@@ -67,9 +67,9 @@ inline glm::vec3 ImageTexture::Value(const float u, const float v, const glm::ve
 	if (j < 0) j = 0;
 	if (i > width_ - 1) i = width_ - 1;
 	if (j > height_ - 1) j = height_ - 1;
-	float r = static_cast<float>(static_cast<int>(img_data_[comp_ * i + comp_ * width_ * j])) / 255.f;
-	float g = static_cast<float>(static_cast<int>(img_data_[comp_ * i + comp_ * width_ * j + 1])) / 255.f;
-	float b = static_cast<float>(static_cast<int>(img_data_[comp_ * i + comp_ * width_ * j + 2])) / 255.f;
+	float r = img_data_[comp_ * i + comp_ * width_ * j];
+	float g = img_data_[comp_ * i + comp_ * width_ * j + 1];
+	float b = img_data_[comp_ * i + comp_ * width_ * j + 2];
 	return glm::vec3(r, g, b);
 }
 

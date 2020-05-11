@@ -1,12 +1,9 @@
 #include "world.hpp"
 
-#include <stb_img/stb_image.h>
 
 EquirectBackground::EquirectBackground(const char* path, float rotation)
 {
-	img_data_ = stbi_loadf(path,&width_, &height_, &comp_, 0);
-	if (img_data_ == nullptr)
-		std::cerr << "Texture at path " << path << " not found\n";
+	texture_ = std::make_shared<ImageTexture>(path);
 
 	rotation_deg_ = rotation;
 	if (rotation_deg_ == 0.f)
@@ -22,5 +19,4 @@ EquirectBackground::EquirectBackground(const char* path, float rotation)
 
 EquirectBackground::~EquirectBackground()
 {
-	delete[] img_data_;
 };
