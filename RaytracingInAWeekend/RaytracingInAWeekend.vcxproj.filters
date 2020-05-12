@@ -25,6 +25,9 @@
     <Filter Include="Header Files\Hittables">
       <UniqueIdentifier>{e892aa33-e1b9-48f2-9801-8c267498c428}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Hittables">
+      <UniqueIdentifier>{062ebe8c-ab73-44e4-9ea3-03e123e6877b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\ThirdParty\glad\src\glad.c">
@@ -57,25 +60,7 @@
     <ClCompile Include="src\renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\sphere.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\hittable_list.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\moving_sphere.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\aabb.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\bvh_node.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\box.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\instance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\user_interface.cpp">
@@ -92,6 +77,33 @@
     </ClCompile>
     <ClCompile Include="src\textures.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\box.cpp">
+      <Filter>Source Files\Hittables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\bvh_node.cpp">
+      <Filter>Source Files\Hittables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hittable.cpp">
+      <Filter>Source Files\Hittables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\hittable_list.cpp">
+      <Filter>Source Files\Hittables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\instance.cpp">
+      <Filter>Source Files\Hittables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\mesh.cpp">
+      <Filter>Source Files\Hittables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\moving_sphere.cpp">
+      <Filter>Source Files\Hittables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\sphere.cpp">
+      <Filter>Source Files\Hittables</Filter>
+    </ClCompile>
+    <ClCompile Include="src\triangle.cpp">
+      <Filter>Source Files\Hittables</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

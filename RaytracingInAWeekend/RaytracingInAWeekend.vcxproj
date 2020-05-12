@@ -30,10 +30,13 @@
     <ClCompile Include="src\box.cpp" />
     <ClCompile Include="src\bvh_node.cpp" />
     <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\hittable.cpp" />
     <ClCompile Include="src\hittable_list.cpp" />
+    <ClCompile Include="src\mesh.cpp" />
     <ClCompile Include="src\scenes.cpp" />
     <ClCompile Include="src\cube_map.cpp" />
     <ClCompile Include="src\textures.cpp" />
+    <ClCompile Include="src\triangle.cpp" />
     <ClCompile Include="src\user_interface.cpp" />
     <ClCompile Include="src\instance.cpp" />
     <ClCompile Include="src\main.cpp" />
