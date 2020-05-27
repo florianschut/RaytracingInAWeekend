@@ -3,6 +3,7 @@
 #include <corecrt_math_defines.h>
 
 #include "aabb.hpp"
+#include "ImGui/imgui.h"
 
 bool Sphere::Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const
 {
@@ -44,6 +45,17 @@ bool Sphere::BoundingBox(const float, const float, AABB& box) const
 {
 	box = AABB(center_ - glm::vec3(radius_), center_ + glm::vec3(radius_));
 	return true;
+}
+
+void Sphere::ImGuiMenu()
+{
+	if (name_.empty())
+		name_ = "Sphere";
+	if (ImGui::CollapsingHeader(name_.c_str()))
+	{
+		ImGui::Text("Sphere settings");
+		ImGui::Separator();
+	}
 }
 
 void Sphere::UV(const glm::vec3& p, float& u, float& v)

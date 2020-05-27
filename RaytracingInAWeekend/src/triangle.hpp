@@ -12,7 +12,7 @@ public:
 	inline Triangle(float* vertices, unsigned int pos_offset, unsigned int normal_offset, unsigned int stride, std::shared_ptr<Material> material);
 	inline bool Hit(const Ray& r, float t_min, float t_max, HitRecord& record) const override;
 	bool BoundingBox(const float, const float, AABB& box) const override;
-	
+	void ImGuiMenu() override;
 private:
 	glm::vec3 ver0_;
 	glm::vec3 edge0_, edge1_, normal_;;

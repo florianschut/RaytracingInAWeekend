@@ -101,14 +101,7 @@ void UserInterface::SceneEditor(Renderer& renderer)
 	ImVec2 size = ImGui::GetContentRegionAvail();
 	size.y -= ImGui::GetItemsLineHeightWithSpacing();
 
-	//TODO: Manually track names in hittables
-	auto world = typeid(*renderer.GetWorld()->GetHittable()).name();
-	ImGui::CollapsingHeader(world);
-
-	for (auto items = 0; items < item_count; items++)
-	{
-		ImGui::CollapsingHeader(("Item nr: " + std::to_string(items)).c_str());
-	}
+	renderer.GetWorld()->GetHittable()->ImGuiMenu();
 	
 	ImGui::End();
 }

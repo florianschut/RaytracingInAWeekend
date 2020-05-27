@@ -33,6 +33,8 @@ public:
 		uvw.BuildFromW(direction);
 		return uvw.Local(utility::RandomToSphere(radius_, distance_squared));
 	}
+
+	void ImGuiMenu() override;
 	
 	static void UV(const glm::vec3& p, float& u, float& v);
 private:

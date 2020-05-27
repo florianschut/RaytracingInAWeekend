@@ -13,7 +13,8 @@ public:
 		box = AABB(pmin_, pmax_);
 		return true;
 	}
-
+	void ImGuiMenu() override;
+	
 private:
 	glm::vec3 pmin_, pmax_;
 	HittableList rect_list_;

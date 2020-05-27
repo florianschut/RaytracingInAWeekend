@@ -1,6 +1,7 @@
 #include "box.hpp"
 #include "rectangle.hpp"
 #include "hittable_list.hpp"
+#include "ImGui/imgui.h"
 
 Box::Box(const glm::vec3& p0, const glm::vec3& p1, std::shared_ptr<Material> material): pmin_(p0), pmax_(p1)
 {
@@ -12,3 +13,13 @@ Box::Box(const glm::vec3& p0, const glm::vec3& p1, std::shared_ptr<Material> mat
 	rect_list_.Add(std::make_shared<FlipNormals>(std::make_shared<YZRect>(p0.y, p1.y, p0.z, p1.z, p0.x, material)));
 }
 
+inline void Box::ImGuiMenu()
+{
+	if (name_.empty())
+		name_ = "Box";
+	if (ImGui::CollapsingHeader(name_.c_str()))
+	{
+		ImGui::Text("Box Settings");
+		ImGui::Separator();
+	}
+}

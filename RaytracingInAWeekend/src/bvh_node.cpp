@@ -1,6 +1,10 @@
 #include "bvh_node.hpp"
 #include "random.hpp"
 #include <iostream>
+#include <string>
+
+
+#include "ImGui/imgui.h"
 
 
 inline bool BoxCompare(const std::shared_ptr<Hittable> a, const std::shared_ptr<Hittable> b, int axis)
@@ -73,4 +77,25 @@ bool BvhNode::Hit(const Ray& r, float t_min, float t_max, HitRecord& rec) const
 	const auto hit_right = right_->Hit(r, t_min, hit_left ? rec.t : t_max, rec);
 	
 	return hit_left || hit_right;
+}
+
+inline void BvhNode::ImGuiMenu()
+{
+	if (ImGui::CollapsingHeader("BvH Tree"))
+		ImGuiChildren();
+}
+
+void BvhNode::ImGuiChildren()
+{
+	auto left_ptr = std::dynamic_pointer_cast<BvhNode>(left_);
+	if (left_ptr)
+		left_ptr->ImGuiChildren();
+	else
+		left_->ImGuiMenu();
+
+	auto right_ptr = std::dynamic_pointer_cast<BvhNode>(right_);
+	if (right_ptr)
+		right_ptr->ImGuiChildren();
+	else
+		right_->ImGuiMenu();
 }
